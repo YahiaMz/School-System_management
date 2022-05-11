@@ -1,6 +1,7 @@
 import { Group } from "src/group/entities/group.entity";
 import { Module } from "src/module/module.entity";
 import { Sale } from "src/sale/entities/sale.entity";
+import { Section } from "src/section/entities/section.entity";
 import { Teacher } from "src/teacher/teacher.entity";
 import { Timetable } from "src/timetable/entities/timetable.entity";
 import { Check, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
@@ -36,9 +37,9 @@ export class Lesson {
     updated_at: string;
 
 
-    @ManyToOne(type =>Timetable , {onDelete : 'CASCADE' , onUpdate : "CASCADE"})
-    @JoinColumn({name: 'timeTable_Id'})
-    timeTable : Timetable;
+    @ManyToOne(type =>Section , { onDelete : 'CASCADE' , onUpdate : "CASCADE"})
+    @JoinColumn({name: 'section_Id'})
+    section : Section;
 
     
     @ManyToOne(type => Sale , { nullable : false , onDelete : 'CASCADE' , onUpdate : "CASCADE"})

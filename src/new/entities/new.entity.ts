@@ -9,6 +9,9 @@ export class New {
     @PrimaryGeneratedColumn()
     id : number;
 
+    @Column({type : 'varchar', nullable : true })
+    object : string;
+
     @Column({type : 'varchar', nullable : false })
     message : string;
 

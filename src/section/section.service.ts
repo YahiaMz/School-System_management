@@ -41,6 +41,8 @@ return spec;
 async findSpeciality_In_Batch( batch_Id : number , spec_Id : number ){ 
  
 
+
+  
   let batch = await this.batchService.findBatchByIdOrThrow_Exp(batch_Id);
   
   try {
@@ -53,7 +55,6 @@ async findSpeciality_In_Batch( batch_Id : number , spec_Id : number ){
 
   } catch (error) {
     console.log(error.message);
-    
     throw new HttpException( My_Helper.FAILED_RESPONSE('something wrong !') , 201);
   }
  
@@ -62,13 +63,17 @@ async findSpeciality_In_Batch( batch_Id : number , spec_Id : number ){
 }
 
   async create(createSectionDto: CreateSectionDto) {
- 
-    let specialityInBatch = await this.findSpeciality_In_Batch(createSectionDto.batch_Id , createSectionDto.speciality_Id);
-   
+    console.log(createSectionDto);
+    
+    let batch = await this.batchService.findBatchByIdOrThrow_Exp(createSectionDto.batch_Id);
+
+    if ( createSectionDto.speciality_Id ) { 
+        let specialityInBatch = await this.findSpeciality_In_Batch(createSectionDto.batch_Id , createSectionDto.speciality_Id);
+    }
   let section;
  try {
   section = this.sectionRepo.create({name : createSectionDto.name , batch_Id : createSectionDto.batch_Id , 
-   speciality_Id : createSectionDto.speciality_Id
+   speciality_Id : createSectionDto.speciality_Id ? createSectionDto.speciality_Id : null
   });
 
     await this.sectionRepo.save(section);
@@ -84,6 +89,7 @@ return section;
   }
 
   async findAll(batch_Id : number , spec_Id :number) {
+
 
 
     try {
@@ -156,4 +162,20 @@ return section;
   }
   throw new HttpException(My_Helper.FAILED_RESPONSE('section not found !') , 201);
  }
+
+
+
+ public async findSectionsByBatch_Id ( batch_Id : number ) { 
+
+  try {
+    return await this.sectionRepo.query(`SELECT * FROM section s where s.batch_Id =${batch_Id} and s.speciality_Id is null`);
+  } catch (e ) {
+   throw new HttpException( 
+     My_Helper.FAILED_RESPONSE('something wrong while finding Section by batch_Id ')
+    , 201) ;
+  }
+ 
+ }
+
+
 }

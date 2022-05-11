@@ -8,6 +8,8 @@ import { TeacherModule } from 'src/teacher/teacher.module';
 import { GroupModule } from 'src/group/group.module';
 import { TimetableModule } from 'src/timetable/timetable.module';
 import { ModuleModule } from 'src/module/module.module';
+import { SectionService } from 'src/section/section.service';
+import { SectionModule } from 'src/section/section.module';
 
 @Module({
   controllers: [LessonController],
@@ -16,7 +18,7 @@ import { ModuleModule } from 'src/module/module.module';
   SaleModule , 
   TeacherModule , 
   GroupModule , 
-  TimetableModule ,
+  SectionModule ,
   ModuleModule
 ]
 })

@@ -5,6 +5,7 @@ import { GroupService } from 'src/group/group.service';
 import { ModuleService } from 'src/module/module.service';
 import { My_Helper } from 'src/MY-HELPER-CLASS';
 import { SaleService } from 'src/sale/sale.service';
+import { SectionService } from 'src/section/section.service';
 import { TeacherService } from 'src/teacher/teacher.service';
 import { TimetableService } from 'src/timetable/timetable.service';
 import { Repository } from 'typeorm';
@@ -19,13 +20,13 @@ export class LessonService {
                 private saleService : SaleService , 
                 private groupService : GroupService , 
                 private teacherService : TeacherService , 
-                private timeTableService : TimetableService , 
+                private sectionService : SectionService , 
                 private moduleService : ModuleService
   ) { }
 
 
   async create(createLessonDto: CreateLessonDto) {
-let timeTable = await this.timeTableService.findTimeTableByIdOrThrowException(createLessonDto.timeTable_Id)
+let section = await this.sectionService.findSectionByIdOrThrowException(createLessonDto.section_Id)
 let sale = await this.saleService.findSaleByIdOrThrowExp(createLessonDto.sale_Id);
 let teacher = await this.teacherService.findTeacherByIdOrThrowExp(createLessonDto.teacher_Id);
 let mModule = await this.moduleService.findModuleByIdOrThrow_Exp(createLessonDto.module_Id);
@@ -44,12 +45,11 @@ try {
     startingTime : createLessonDto.startingTime , 
     endingTime : createLessonDto.endingTime , 
   });
-  lesson.timeTable = timeTable;
   lesson.sale = sale;
   lesson.teacher = teacher;
   lesson.group = group;
   lesson.module = mModule;
-
+ lesson.section = section;
 
   let newLesson = await this.lessonRepository.save(lesson);
   return newLesson;
@@ -61,12 +61,12 @@ try {
 
   }
 
-async  findAll_LessonsOfTimeTable( timeTable_Id : number ) {
-let timeTable = await this.timeTableService.findTimeTableByIdOrThrowException(timeTable_Id);
+async  findAll_LessonsOfSection( section_Id  : number ) {
+let section = await this.sectionService.findSectionByIdOrThrowException(section_Id);
  try {
    let lessons = await this.lessonRepository.find({ 
      where : {
-       timeTable : timeTable 
+       section : section 
      }, 
      relations : ['teacher' , 'group' , 'sale' , 'module' ]
    })
@@ -98,9 +98,9 @@ let timeTable = await this.timeTableService.findTimeTableByIdOrThrowException(ti
 
 async update(id: number, updateLessonDto: UpdateLessonDto) {
     let lesson = await this.findLessonByIdOrThrowExp(id);
-    if ( updateLessonDto.timeTable_Id ){
-    let timeTable = await this.timeTableService.findTimeTableByIdOrThrowException(updateLessonDto.timeTable_Id)
-    lesson.timeTable = timeTable;
+    if ( updateLessonDto.section_Id ){
+    let section = await this.sectionService.findSectionByIdOrThrowException(updateLessonDto.section_Id)
+    lesson.section = section;
   }
     
   if (updateLessonDto.sale_Id) {

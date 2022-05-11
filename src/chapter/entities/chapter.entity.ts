@@ -1,8 +1,9 @@
 import { Batch } from "src/batch/entities/batch.entity";
 import { Module } from "src/module/module.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 
 @Entity({name : 'chapters'})
+@Unique(['name','batch' , 'module'])
 export class Chapter {
     
     @PrimaryGeneratedColumn()
@@ -18,10 +19,10 @@ export class Chapter {
     lecture_file : string;
 
     @Column({type : 'varchar' , nullable : true})
-    td1_file : string;
+    td_file : string;
     
     @Column({type : 'varchar' , nullable : true})
-    td2_file : string;
+    td_correction_file : string;
 
     @CreateDateColumn()
     created_at: string;

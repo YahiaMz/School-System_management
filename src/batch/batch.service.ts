@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Level } from 'src/level/entities/level.entity';
 import { LevelService } from 'src/level/level.service';
 import { My_Helper } from 'src/MY-HELPER-CLASS';
+import { Section } from 'src/section/entities/section.entity';
+import { SectionService } from 'src/section/section.service';
 import { Speciality } from 'src/speciality/entities/speciality.entity';
 import { In, Repository } from 'typeorm';
 import { CreateBatchDto } from './dto/create-batch.dto';
@@ -17,7 +19,7 @@ export class BatchService {
   constructor (@InjectRepository(Batch) private batchRepo : Repository<Batch>  , 
   private levelService : LevelService ,
   @InjectRepository(Speciality) private specRepo : Repository<Speciality> , 
-  @InjectRepository(Batches_has_many_specialities) private add_spec_to_batchRepo : Repository<Batches_has_many_specialities>
+  @InjectRepository(Batches_has_many_specialities) private add_spec_to_batchRepo : Repository<Batches_has_many_specialities> , 
   ) {}
 
   async create(createBatchDto: CreateBatchDto) {
@@ -59,6 +61,25 @@ try {
 
   }
 
+
+
+  private async findSectionsOfBatch( batch_Id : number) { 
+    let batch = this.findBatchByIdOrThrow_Exp(batch_Id);
+    try {
+      
+    let sectionsOfBatch =await this.batchRepo.query(`SELECT * FROM section where section.batch_Id = ${batch_Id} and section.speciality_Id is null`);
+   return sectionsOfBatch;
+  } catch (error) {
+ 
+    throw ( 
+  
+      new HttpException(My_Helper.FAILED_RESPONSE(`Something wrong ! , $error.message}`) , 201)
+      );
+  } 
+
+  }
+
+
   async findOne(id: number) {
     let batch; 
     try {
@@ -67,21 +88,36 @@ try {
          {  relations : ['level']
            } );
 
-
        let specialitiesOfthisBatchesInItCurrentLevel = await this.add_spec_to_batchRepo.find({
          where : { 
-        batch : batch , 
+         batch : batch , 
          in_level : batch.level
          } , 
+        
          relations : ['speciality']
          }
          );
 
-         batch['specialities'] = specialitiesOfthisBatchesInItCurrentLevel;
-       //let level = await this.levelService.findOne(batch.level);
-       //batch.level = level;
+         let specialities = [];
+         if ( specialitiesOfthisBatchesInItCurrentLevel.length>0 ) {
+
+          for (let x : number = 0 ;x < specialitiesOfthisBatchesInItCurrentLevel.length ;x ++){
+            specialities.push( specialitiesOfthisBatchesInItCurrentLevel[x].speciality);
+          }
+
+
+         batch['hasSpecialities'] = true;
+          batch['specialities'] = specialities;
 
        return batch;
+      } else { 
+        let sections = await this.findSectionsOfBatch(batch.id) ;
+        batch['hasSpecialities'] = false;
+        batch['sections'] = sections;
+      
+        return batch;
+      }
+
       } catch (e) {
         console.log(e.message);
         
@@ -96,7 +132,7 @@ try {
 public async findBatchByIdOrThrow_Exp( id : number) {
   let batch; 
     try {
-        batch = await this.batchRepo.findOne({id : id});
+        batch = await this.batchRepo.findOne({id : id  } , {loadRelationIds : true});
      } catch (error) {
        throw (new HttpException(My_Helper.FAILED_RESPONSE('something wrong !') , 201))
      }

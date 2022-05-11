@@ -25,7 +25,7 @@ export class LessonController {
       }
     }
 
-    let lessonsOfTimeTable = await this.lessonService.findAll_LessonsOfTimeTable(timeTable_Id);
+    let lessonsOfTimeTable = await this.lessonService.findAll_LessonsOfSection(timeTable_Id);
     return My_Helper.SUCCESS_RESPONSE(lessonsOfTimeTable);
   }
 

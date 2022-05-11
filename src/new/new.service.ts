@@ -65,7 +65,6 @@ private async findTeacherByIdOrThrowExp ( teacher_Id : number) {
     
 
     let teacher = await this.findTeacherByIdOrThrowExp(createNewDto.teacher_Id);
-    let fakeGroups : number[] = [1 , 5 , 7];
     let mGroups:Group[] = [];
 // finding the groups 
    for (let x = 0 ; x<createNewDto.groups.length; x ++) { 
@@ -75,7 +74,7 @@ private async findTeacherByIdOrThrowExp ( teacher_Id : number) {
 // groups are founded
 
     try { 
-    let mNew = await this.newsRepository.create({message : createNewDto.message});
+    let mNew = await this.newsRepository.create({message : createNewDto.message , object :createNewDto.object});
      mNew.groups = mGroups;
      mNew.teacher = teacher;
      
@@ -114,7 +113,7 @@ private async findTeacherByIdOrThrowExp ( teacher_Id : number) {
       
       let newsOfThisGroup =  await this.newsRepository.
       query(
-        `SELECT id AS newsId ,group_Id , message , fileUrl , teacher_Id , created_at , approved_date
+        `SELECT id AS newsId ,group_Id ,object, message , fileUrl , teacher_Id , created_at , approved_date
         FROM groupsViewNews INNER JOIN news ON groupsViewNews.new_Id = news.id
         WHERE approved AND groupsViewNews.group_Id = ${group_id} ORDER BY news.created_at desc ;`
 
@@ -187,6 +186,13 @@ private async  findNewByIdOrThrow_Exp ( id: number) {
            news inner join teacher  ON teacher.id = news.teacher_Id 
            WHERE approved = false order by news.approved_date; 
          `);
+
+         for ( let x : number = 0 ; x<newsToApprove.length ; x ++) { 
+           let teacher = await this.findTeacherByIdOrThrowExp(newsToApprove[x].teacher_Id);
+           
+           newsToApprove[x]['teacher'] = teacher;
+           delete newsToApprove[x].teacher_Id;
+          }
 
       return newsToApprove;
      } catch (error) {

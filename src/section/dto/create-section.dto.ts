@@ -1,4 +1,4 @@
-import { IsInt, IsPositive, IsString } from "class-validator";
+import { IsInt, IsOptional, IsPositive, IsString } from "class-validator";
 
 export class CreateSectionDto {
 
@@ -9,6 +9,7 @@ export class CreateSectionDto {
 
     @IsInt()
     @IsPositive()
+    @IsOptional()
     speciality_Id : number;
 
     @IsString()

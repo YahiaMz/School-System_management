@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Res, UploadedFiles } from '@nestjs/common';
 import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { My_Helper } from 'src/MY-HELPER-CLASS';
 import { ChapterService } from './chapter.service';
@@ -11,15 +11,19 @@ export class ChapterController {
   constructor(private readonly chapterService: ChapterService) {}
 
   @Post('/create')
-@UseInterceptors( FileInterceptor('lecture_file') )
+@UseInterceptors( FileFieldsInterceptor([
+                                         {name : 'lecture_file' , maxCount : 1}  ,
+                                         {name : 'td_file' , maxCount : 1} , 
+                                         {name:"td_correction_file" , maxCount : 1}
+                                        ]))
+
   async create(@Body() createChapterDto: CreateChapterDto , 
-                @UploadedFile() lecture_file : Express.Multer.File
+                @UploadedFiles() files : {lecture_file : Express.Multer.File , td_file : Express.Multer.File , td_correction_file : Express.Multer.File}  
               ) {
-                console.log(lecture_file);
-                
-                
-    let chapter = await this.chapterService.create(createChapterDto , lecture_file);
+                                
+    let chapter = await this.chapterService.create(createChapterDto , files['lecture_file'][0] , files['td_file'][0] , files['td_correction_file'][0] );
     return My_Helper.SUCCESS_RESPONSE(chapter);
+ 
   }
 
   @Get('/all')
@@ -45,7 +49,7 @@ export class ChapterController {
   }
 
 
-  @Get('/lectures/:lecture_name')
+  @Get('/files/:lecture_name')
   async getLectureFile (@Param('lecture_name') lecture_name : string , @Res() res) {
      return this.chapterService.sendLecturesFiles(lecture_name , res );
    }

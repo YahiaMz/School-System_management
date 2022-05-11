@@ -30,5 +30,5 @@ export class CreateLessonDto {
 
 
     @IsInt()
-    timeTable_Id : number;
+    section_Id : number;
 }

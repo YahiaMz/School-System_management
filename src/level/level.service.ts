@@ -26,7 +26,11 @@ export class LevelService {
 
  async findAll() { 
    try {
-    let levels =  await this.levelRepo.find();
+    let levels =  await this.levelRepo.find({
+      order : {
+        level : 'ASC' ,
+      }
+    });
  
     for (let x : number = 0 ; x <levels.length ; x ++ ){
        let currentBatch = await this.levelRepo.query(`select * from batch where batch.level_Id = ${levels[x].id}`);

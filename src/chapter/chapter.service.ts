@@ -19,7 +19,10 @@ export class ChapterService {
               private batchService  : BatchService 
  ) {}
 
-async  create(createChapterDto: CreateChapterDto , lecture_file : Express.Multer.File) {
+async  create(
+   createChapterDto: CreateChapterDto ,
+   lecture_file : Express.Multer.File ,
+    td_file : Express.Multer.File , td_correction_file : Express.Multer.File) {
 
   
   
@@ -30,10 +33,33 @@ async  create(createChapterDto: CreateChapterDto , lecture_file : Express.Multer
             );
    }
 
+   let td_file_Name = null;
+ 
+   if (td_file ) { 
+        if(!My_Helper.is_Lecture(td_file.mimetype)) {
+          throw new HttpException(My_Helper.FAILED_RESPONSE("TD file must be of type {.pdf , .ppt}") , 200)
+        } 
+      td_file_Name =  'td_'+createChapterDto.name+'_'+ uuidv4()+My_Helper.fileExtinction(td_file.mimetype);
+      }
+
+       
+      let td_correction_file_name = null;
+   if (td_correction_file ) { 
+    if(!My_Helper.is_Lecture(td_correction_file.mimetype)) {
+      throw new HttpException(My_Helper.FAILED_RESPONSE("Td correction file must be of type {.pdf , .ppt}") , 200)
+    } 
+    td_correction_file_name =  'td_Correction_'+createChapterDto.name+'_'+ uuidv4()+ My_Helper.fileExtinction(td_file.mimetype);
+  }
+
+
     let mModule = await  this.moduleService.findModuleByIdOrThrow_Exp(createChapterDto.module_Id);
     let batch  = await  this.batchService.findBatchByIdOrThrow_Exp(createChapterDto.batch_Id);
     
     
+
+
+
+
     delete batch.specialities;
     delete batch.created_at;
     delete batch.updated_at;
@@ -52,15 +78,27 @@ async  create(createChapterDto: CreateChapterDto , lecture_file : Express.Multer
       chapter.batch = batch;
       chapter.module = mModule;
 
-      let mLecture_fileName = uuidv4() + My_Helper.fileExtinction(lecture_file.mimetype);
+      let mLecture_fileName = 'Cours_'+createChapterDto.name+'_'+ uuidv4()  + My_Helper.fileExtinction(lecture_file.mimetype);
       let mPath = My_Helper.chaptersFilesPath + mLecture_fileName;
 
       const writeStreamForChapter = createWriteStream(mPath);
-      
         writeStreamForChapter.write(lecture_file.buffer)
         chapter.lecture_file = mLecture_fileName;
-     
-     
+      
+        // saving the fucking td file 
+        if  (td_file_Name) {
+        const writeStreamForTdFile = createWriteStream (My_Helper.chaptersFilesPath +td_file_Name);
+        writeStreamForTdFile.write(td_file.buffer);
+        chapter.td_file = td_file_Name;
+       } 
+
+       // saving the fucking td_correctionFILE
+       if  (td_correction_file_name) {
+        const writeStreamForTdFileCorrection = createWriteStream (My_Helper.chaptersFilesPath + td_correction_file_name);
+        writeStreamForTdFileCorrection.write(td_correction_file.buffer);
+        chapter.td_correction_file = td_correction_file_name;
+       } 
+
 
       return await this.chapterRepository.save(chapter);
 

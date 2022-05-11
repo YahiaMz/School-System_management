@@ -1,5 +1,5 @@
 
-import {IsDateString, IsEmail , IsString, MinLength} from 'class-validator';
+import {IsDateString, IsEmail , IsOptional, IsString, MinLength} from 'class-validator';
 
 export class CreateTeacherDto {
     
@@ -23,6 +23,7 @@ export class CreateTeacherDto {
     wilaya : string;
 
     @IsDateString()
+    @IsOptional()
     dateOfBirth : string;
 
 
