@@ -93,7 +93,6 @@ try {
          batch : batch , 
          in_level : batch.level
          } , 
-         loadRelationIds : true,
          relations : ['speciality']
          }
          );
