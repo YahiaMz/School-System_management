@@ -1,5 +1,6 @@
 import { trace } from "console";
 import { Module } from "src/module/module.entity";
+import { Student } from "src/module/student.entity";
 import { Column, CreateDateColumn, Entity,  OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { SpecialityHasManyMoudules } from "./specialityHasManyModule.entity";
 
@@ -29,5 +30,9 @@ export class Speciality
 
     @OneToMany(type => SpecialityHasManyMoudules , shm => shm.speciality , {onDelete : 'CASCADE' , onUpdate : 'CASCADE'})
     modules : SpecialityHasManyMoudules[];
+
+    @OneToMany(type => Student , std => std.speciality ,
+        {onDelete : 'CASCADE' , onUpdate : 'CASCADE'})
+    students : Student[];
 
 }

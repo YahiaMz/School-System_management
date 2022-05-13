@@ -1,4 +1,4 @@
-import {IsDateString, IsEmail , IsInt, IsPositive, IsString} from 'class-validator';
+import {IsDateString, IsEmail , IsInt, IsOptional, IsPositive, IsString} from 'class-validator';
 
 export class CreateStudentDto { 
 
@@ -21,6 +21,19 @@ export class CreateStudentDto {
     @IsDateString()
     dateOfBirth : string;
 
+    @IsInt()
+    @IsPositive()
+    batch_Id : number;   
+
+    @IsOptional()
+    @IsInt()
+    @IsPositive()
+    speciality_Id : number;   
+    
+    @IsInt()
+    @IsPositive()
+    section_Id : number;   
+    
     @IsInt()
     @IsPositive()
     group_Id : number;   

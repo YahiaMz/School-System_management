@@ -14,31 +14,74 @@ import {v4 as uuidv4} from 'uuid';
 import { Group } from 'src/group/entities/group.entity';
 import { GroupService } from 'src/group/group.service';
 import { UpdateStudentDto } from './dtos/update-student.dto';
+import { LevelService } from 'src/level/level.service';
+import { SectionService } from 'src/section/section.service';
+import { SpecialityService } from 'src/speciality/speciality.service';
+import { BatchService } from 'src/batch/batch.service';
 
 
 @Injectable()
 export class StudentService {
 
     constructor ( @InjectRepository(Student) private studentRep : Repository<Student> ,
-                  private groupService : GroupService
+                  private groupService : GroupService , 
+                  private batchService : BatchService , 
+                  private sectionService : SectionService , 
+                  private speciality_Service : SpecialityService 
     ) { }
     private salt : number = 9;
 
 
     async create( createStudentDto : CreateStudentDto ) { 
 
-  
-      let group = null ;
-      if (createStudentDto.group_Id) {
-          group = await this.groupService.findGroupByIdOrThrowExp(createStudentDto.group_Id);
+      let batch = await this.batchService.findBatchByIdOrThrow_Exp(createStudentDto.batch_Id);
+      
+     
+      
+      let speciality = null ;
+      if (createStudentDto.speciality_Id) { 
+         console.log(`testing if spec ${createStudentDto.speciality_Id} in batch  ${createStudentDto.batch_Id}`);
+         speciality = await this.speciality_Service.findSpecialityByIdoOrThrowExp (createStudentDto.speciality_Id);
+
+      if (speciality && !this.batchService.doesThisbatchHasThisSpeciality (createStudentDto.batch_Id , createStudentDto.speciality_Id)) { 
+         throw new HttpException(My_Helper.FAILED_RESPONSE('speciality does not exist in this level') , 200);
+      }   
+      
+   }
+      let section = await this.sectionService.findSectionByIdOrThrowException(createStudentDto.section_Id);
+      if(speciality) { 
+         if (!this.sectionService.doesThisSectionExistInThisSpeciality(createStudentDto.section_Id , createStudentDto.speciality_Id)){
+            throw new HttpException(My_Helper.FAILED_RESPONSE('this section does not exist in this speciality') , 200);
          }
+      } else { 
+         let batchHasSection = await this.sectionService.doesThisSectionExistInThisBatch(createStudentDto.section_Id , createStudentDto.batch_Id);
+         if(!batchHasSection) { 
+            throw new HttpException(My_Helper.FAILED_RESPONSE('this section does not exist in this batch') , 200); 
+         }
+      }
 
+      let group = await this.groupService.findGroupByIdOrThrowExp(createStudentDto.group_Id);
+      if (group.section.id != section.id) {
+         throw new HttpException(My_Helper.FAILED_RESPONSE('this group does not exist in this section') , 200); 
+      }
 
+      
      try {
        let HashedPassword = await brcypt.hash(createStudentDto.password , this.salt);
        delete createStudentDto.password;
 
-       let student = await this.studentRep.create(createStudentDto);
+       let student = await this.studentRep.create({
+          name : createStudentDto.name , 
+          lastName : createStudentDto.lastName , 
+          email : createStudentDto.email , 
+          password : createStudentDto.password , 
+          dateOfBirth : createStudentDto.dateOfBirth , 
+          batch : batch , 
+          wilaya : createStudentDto.wilaya ,
+          speciality : speciality , 
+          section : section , 
+          group : group,
+       });
        student.password = HashedPassword;
        student.group = group;
       
@@ -156,7 +199,7 @@ async updateStudent( id : number, updateStudent : UpdateStudentDto ) {
       'profileImage' ,
       'created_at'  ,
       'updated_at' 
-   ] , relations : ['group']});
+   ] , relations : ['group' , "Batch"]});
 
  return students;
     }
@@ -182,6 +225,23 @@ async deleteStudent(id : number) {
 }
   await this.studentRep.remove(student);
  }
+
+
+
+ async getAllStudentOfSpec( spec_Id : number ) {
+   
+   try {
+      let studentsOfSpeciality = await this.studentRep.query(`
+      SELECT * FROM student where student.speciality_Id = ${spec_Id}`);
+      return studentsOfSpeciality;
+   } catch (error) {
+      throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong while fetching students of this speciality ' ), 201); 
+   }
+   
+
+   }
+
+ 
 
 
 

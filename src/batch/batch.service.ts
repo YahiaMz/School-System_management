@@ -85,7 +85,7 @@ try {
     try {
        batch = await this.batchRepo.findOneOrFail(
          {  id : id   } ,
-         {  relations : ['level']
+         {  relations : ['level', 'students']
            } );
 
        let specialitiesOfthisBatchesInItCurrentLevel = await this.add_spec_to_batchRepo.find({
@@ -93,7 +93,7 @@ try {
          batch : batch , 
          in_level : batch.level
          } , 
-        
+         loadRelationIds : true,
          relations : ['speciality']
          }
          );
@@ -193,7 +193,7 @@ public async findBatchByIdOrThrow_Exp( id : number) {
 
         
         if ( !spec ) throw new HttpException( 
-          My_Helper.FAILED_RESPONSE('speciality not found , so you cant add this speciality to this batch')
+          My_Helper.FAILED_RESPONSE('speciality not found ')
            ,  
           201
         );
@@ -267,6 +267,36 @@ public async findBatchByIdOrThrow_Exp( id : number) {
     }
 
       
+  }
+
+
+
+  // i am using this function in other service 
+  public async doesThisbatchHasThisSpeciality( batch_Id : number , spec_Id : number) { 
+
+  
+    try {
+      
+    let batchHasSpec = await this.add_spec_to_batchRepo.query(`SELECT * FROM batches_has_many_specialities  where batches_has_many_specialities.batch_Id = ${batch_Id} 
+     and  batches_has_many_specialities.speciality_Id = ${spec_Id}
+    `);
+
+    console.log(batchHasSpec);
+    
+    if (batchHasSpec.length > 0) { 
+      return true;
+    }
+ 
+    } catch ( err ) {
+      throw new HttpException( 
+        My_Helper.FAILED_RESPONSE(`something wrong ! , err : ${err.message}`)
+         ,  
+        201
+      ); 
+    }
+
+    return false;
+
   }
 
 

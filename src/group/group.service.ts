@@ -19,7 +19,7 @@ export class GroupService {
 //  this function is for other services like lesson , news  ... 
   public async findGroupByIdOrThrowExp ( id : number ) : Promise<Group> {
     try {
-      let group = await this.groupRepository.findOne({id : id});
+      let group = await this.groupRepository.findOne({id : id} , {relations : ['section']});
       if (group) return group;
     } catch (error) {
       throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong !') , 201);

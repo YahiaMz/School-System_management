@@ -29,11 +29,26 @@ export class UpdateStudentDto {
     @IsString( ) 
     wilaya : string;
 
+    
+
+    @IsOptional()
+    @IsInt()
+    @IsPositive()
+    speciality_Id : number;   
+
+
+    @IsOptional()
+    @IsInt()
+    @IsPositive()
+    section_Id : number;   
 
     @IsOptional()
     @IsInt()
     @IsPositive()
     group_Id : number;   
+
+
+
 
 
 

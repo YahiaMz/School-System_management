@@ -37,12 +37,12 @@ return spec;
 
 }
 
+
+
+
 // yo dont forget you're looking for speciality in batch in the current level 
 async findSpeciality_In_Batch( batch_Id : number , spec_Id : number ){ 
- 
-
-
-  
+   
   let batch = await this.batchService.findBatchByIdOrThrow_Exp(batch_Id);
   
   try {
@@ -103,29 +103,29 @@ return section;
   }
 
   async findOne(section_Id: number) {
-    let section;
+    let section = null;
     
     try {
       section = await this.sectionRepo.findOne({
         where : {id : section_Id},
         relations : [
-         "groups"  
+         "groups" ,
+         "students"
       ]
        });
 
        
 
-      if ( section ) {
+    //   if ( section ) {
 
-
-    let batch = await this.batchService.findBatchByIdOrThrow_Exp(section.batch_Id);
-    let spec =await this.findSpecialityByIdOrThrowExp(section.speciality_Id);
+    // let batch = await this.batchService.findBatchByIdOrThrow_Exp(section.batch_Id);
+    // let spec =await this.findSpecialityByIdOrThrowExp(section.speciality_Id);
           
-        section['speciality'] = spec;
-        section['batch'] = batch;
+    //     section['speciality'] = spec;
+    //     section['batch'] = batch;
 
+    if ( section)
         return section
-      };
     } catch (error) {
       console.log(error.message);
       throw new HttpException(My_Helper.FAILED_RESPONSE('Something wrong , Id must be a number') , 201);     
@@ -176,6 +176,46 @@ return section;
   }
  
  }
+
+
+  public async doesThisSectionExistInThisSpeciality ( section_Id , spec_Id){
+   try {
+     let result = await this.sectionRepo.find({
+       id : section_Id , 
+       speciality_Id : spec_Id
+     })
+
+     if ( result.length > 0 ) {
+        return true;
+     }
+   } catch (error) {
+    throw new HttpException( 
+      My_Helper.FAILED_RESPONSE('something wrong : ' + error.message)
+     , 201) ;
+   }
+   return false ;
+  }
+
+
+  public async doesThisSectionExistInThisBatch ( section_Id , batch_Id){
+    try {
+      let result = await this.sectionRepo.find({
+        id : section_Id , 
+        batch_Id : batch_Id
+      })
+ 
+      if ( result.length > 0 ) {
+         return true;
+      }
+    } catch (error) {
+     throw new HttpException( 
+       My_Helper.FAILED_RESPONSE('something wrong : ' + error.message)
+      , 201) ;
+    }
+    return false ;
+   }
+
+
 
 
 }

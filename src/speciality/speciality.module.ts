@@ -12,6 +12,7 @@ import { SpecialityHasManyMoudules } from './entities/specialityHasManyModule.en
   providers: [SpecialityService] , 
   imports : [TypeOrmModule.forFeature([Speciality , Batch , ModuleEntity  , 
   SpecialityHasManyMoudules
-  ])]
+  ])] ,
+  exports : [SpecialityService]
 })
 export class SpecialityModule {}

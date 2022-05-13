@@ -1,6 +1,10 @@
 import { group } from "console";
 import { type } from "os";
+import { Batch } from "src/batch/entities/batch.entity";
 import { Group } from "src/group/entities/group.entity";
+import { Level } from "src/level/entities/level.entity";
+import { Section } from "src/section/entities/section.entity";
+import { Speciality } from "src/speciality/entities/speciality.entity";
 import { Column, Entity, PrimaryGeneratedColumn , CreateDateColumn , UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
 
 
@@ -37,13 +41,27 @@ export class Student{
     @CreateDateColumn()
     created_at: Date;
    
-   @UpdateDateColumn()
+    @UpdateDateColumn()
     updated_at: Date;
 
+    @ManyToOne(type => Batch  , batch => batch.students ,{nullable : false , onDelete : "CASCADE" , onUpdate : "CASCADE" })
+    @JoinColumn({name : 'batch_Id'})
+    public batch : Batch;
 
-    @ManyToOne  ( type => Group   , group=> group.students,  {nullable : true , onDelete:'SET NULL' , onUpdate : 'SET NULL'} )
+ 
+    @ManyToOne(type => Speciality  , {nullable : true , onDelete : "CASCADE" , onUpdate : "CASCADE" })
+    @JoinColumn({name : 'speciality_Id'})
+    public speciality : Speciality;   
+
+
+    @ManyToOne(type => Section  , {nullable : false , onDelete : "CASCADE" , onUpdate : "CASCADE" })
+    @JoinColumn({name : 'section_Id'})
+    public section : Section;
+
+    @ManyToOne  ( type => Group   , group=> group.students,  {nullable : false , onDelete:'CASCADE' , onUpdate : 'CASCADE'} )
     @JoinColumn ( { name : 'group_Id' } )
     public group : Group;
+
 
 
 }

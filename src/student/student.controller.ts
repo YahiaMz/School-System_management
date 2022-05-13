@@ -50,6 +50,11 @@ async getAllStudents ( ) {
      return My_Helper.SUCCESS_RESPONSE( await this.studentService.allStudents() );
      
 }
+@Get('/allOfSpeciality/:spec_Id')
+async getAllStudentsOfSepecaility (@Param('spec_Id') speciality_Id : number ) { 
+     return My_Helper.SUCCESS_RESPONSE( await this.studentService.getAllStudentOfSpec(speciality_Id) );
+     
+}
 
 
 @Get('/:id')

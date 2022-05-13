@@ -1,6 +1,7 @@
 import { Level } from "src/level/entities/level.entity";
+import { Student } from "src/module/student.entity";
 import { Speciality } from "src/speciality/entities/speciality.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, TableForeignKey, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, TableForeignKey, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Batch {
@@ -33,6 +34,11 @@ export class Batch {
 
     })
     public specialities : Speciality[];
+
+
+    @OneToMany(type => Student , std => std.batch ,
+         {onDelete : 'CASCADE' , onUpdate : 'CASCADE'})
+    students : Student[];
 
 
 }

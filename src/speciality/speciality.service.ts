@@ -58,7 +58,7 @@ export class SpecialityService {
     throw new HttpException(My_Helper.FAILED_RESPONSE('module not found') , 201);
    }
 
- private async findSpecialityByIdoOrThrowExp( id : number ) { 
+ public async findSpecialityByIdoOrThrowExp( id : number ) { 
   let speciality ; 
   try {
     speciality = await this.specialityRepo.findOne({id : id } ); 
@@ -153,7 +153,7 @@ export class SpecialityService {
     try {
 
 
-       speciality = await this.specialityRepo.findOne({id : speciality_Id});
+       speciality = await this.specialityRepo.findOne({id : speciality_Id } , {relations : ['students']});
        if( speciality ) { 
 
           let modules = await this.specialityHasManyModules.find(
@@ -162,7 +162,7 @@ export class SpecialityService {
             where : {
               speciality : speciality
             } ,
-            relations : ['module']
+            relations : ['module' ]
           });
 
           speciality['modules'] = modules;
@@ -292,5 +292,14 @@ export class SpecialityService {
        return speciality;
   
   }
+
+
+
+ public async doesThisSpecialityHasThisSection( spec_Id : number , section_Id : number){ 
+        let doesThisSpecialityHasThisSection = await this.specialityRepo.query(`
+        SELECT * FROM section where section.id = ${section_Id} and section.
+        `)
+ }
+
 
 }

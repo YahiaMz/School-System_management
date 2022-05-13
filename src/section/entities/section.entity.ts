@@ -1,5 +1,6 @@
 import { group } from "console";
 import { Group } from "src/group/entities/group.entity";
+import { Student } from "src/module/student.entity";
 import { Speciality } from "src/speciality/entities/speciality.entity";
 import { Check, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 
@@ -14,7 +15,6 @@ export class Section {
     @Column({type : 'varchar' } )
     name : string;
 
-    
     @Column({type : 'int' , nullable : false})
     batch_Id : number;
     
@@ -30,6 +30,10 @@ export class Section {
     
     @OneToMany(type => Group , group => group.section)
     groups : Group[];
+
+    @OneToMany(type => Student , std => std.batch ,
+        {onDelete : 'CASCADE' , onUpdate : 'CASCADE'})
+   students : Student[];
 
     
 }
