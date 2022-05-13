@@ -62,7 +62,6 @@ const railwayDb = {
     username : 'root',
     password : 'D6sHcAzKLwAXpwvUuYW2',
     database: 'railway',
-
     entities: [
       Teacher , Admin , ModuleEntity , 
       Student  , Batch , Level , Speciality , 

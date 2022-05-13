@@ -64,5 +64,12 @@ export class NewController {
       return My_Helper.SUCCESS_RESPONSE( newsToApprove );
     }
 
+    // get the new approved 'News' by admin   
+   @Get('/approvedNews')
+   async getApprovedNews ( ) {
+      let approvedNews = await this.newService.approvedNews();
+      return My_Helper.SUCCESS_RESPONSE( approvedNews );
+    }
+
 
 }

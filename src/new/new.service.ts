@@ -182,9 +182,9 @@ private async  findNewByIdOrThrow_Exp ( id: number) {
   public async news_To_Approve ( ) { 
      try {
        let newsToApprove = await this.newsRepository.query(
-         ` SELECT news.id as new_Id , message , fileUrl , teacher_Id , news.created_at FROM 
+         ` SELECT news.id as new_Id , message ,object, fileUrl , teacher_Id , news.created_at FROM 
            news inner join teacher  ON teacher.id = news.teacher_Id 
-           WHERE approved = false order by news.approved_date; 
+           WHERE approved = false order by news.created_at; 
          `);
 
          for ( let x : number = 0 ; x<newsToApprove.length ; x ++) { 
@@ -201,6 +201,34 @@ private async  findNewByIdOrThrow_Exp ( id: number) {
       throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong') , 201);
      } 
   }
+
+
+    // all new News to displaying it to the admin 
+    public async approvedNews ( ) { 
+      try {
+        let newsToApprove = await this.newsRepository.query(
+          ` SELECT news.id as new_Id , message ,object, fileUrl , teacher_Id , news.created_at FROM 
+            news inner join teacher  ON teacher.id = news.teacher_Id 
+            WHERE approved = true order by news.approved_date; 
+          `);
+ 
+          for ( let x : number = 0 ; x<newsToApprove.length ; x ++) { 
+            let teacher = await this.findTeacherByIdOrThrowExp(newsToApprove[x].teacher_Id);
+            
+            newsToApprove[x]['teacher'] = teacher;
+            delete newsToApprove[x].teacher_Id;
+           }
+ 
+       return newsToApprove;
+      } catch (error) {
+        console.log(error.message);
+        
+       throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong') , 201);
+      } 
+   }
+ 
+
+
 
 
 }
