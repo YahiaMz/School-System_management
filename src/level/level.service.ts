@@ -30,6 +30,7 @@ export class LevelService {
       order : {
         level : 'ASC' ,
       }
+      ,relations : ['specialities']
     });
  
     for (let x : number = 0 ; x <levels.length ; x ++ ){

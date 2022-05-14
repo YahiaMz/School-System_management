@@ -201,7 +201,7 @@ async updateStudent( id : number, updateStudent : UpdateStudentDto ) {
       'profileImage' ,
       'created_at'  ,
       'updated_at' 
-   ] , relations : ['group' , "batch"]});
+   ] , relations : ['group' , "section"]});
 
  return students;
     }
