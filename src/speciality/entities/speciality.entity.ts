@@ -1,7 +1,8 @@
 import { trace } from "console";
+import { Level } from "src/level/entities/level.entity";
 import { Module } from "src/module/module.entity";
 import { Student } from "src/module/student.entity";
-import { Column, CreateDateColumn, Entity,  OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity,  JoinColumn,  ManyToOne,  OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { SpecialityHasManyMoudules } from "./specialityHasManyModule.entity";
 
 @Entity()
@@ -34,5 +35,12 @@ export class Speciality
     @OneToMany(type => Student , std => std.speciality ,
         {onDelete : 'CASCADE' , onUpdate : 'CASCADE'})
     students : Student[];
+
+
+    @ManyToOne(type => Level , {nullable : false, onDelete : 'CASCADE' , onUpdate : 'CASCADE'})
+    @JoinColumn({name : 'level_Id'})
+    public level : Level;
+
+
 
 }

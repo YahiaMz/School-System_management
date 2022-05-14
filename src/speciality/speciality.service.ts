@@ -13,6 +13,7 @@ import path = require('path');
 import { v4 as uuidv4 } from 'uuid';
 import { createWriteStream, fstat } from 'fs';
 import { join } from 'path';
+import { LevelService } from 'src/level/level.service';
 const fs = require('fs');
 
 
@@ -22,7 +23,8 @@ export class SpecialityService {
   constructor(@InjectRepository(Speciality) private specialityRepo : Repository<Speciality> , 
       @InjectRepository(Batch) private batchRepo : Repository<Batch> ,
       @InjectRepository(Module) private moduleRepo : Repository<Module>  , 
-      @InjectRepository(SpecialityHasManyMoudules) private specialityHasManyModules : Repository<SpecialityHasManyMoudules>
+      @InjectRepository(SpecialityHasManyMoudules) private specialityHasManyModules : Repository<SpecialityHasManyMoudules> ,
+      private levelService : LevelService
   ) {
     
   }
@@ -82,6 +84,8 @@ export class SpecialityService {
   async create(createSpecialityDto: CreateSpecialityDto , speciality_Image : Express.Multer.File) {
     
 
+    let level = await this.levelService.findOneForUpdate(createSpecialityDto.level_Id);
+
     if ( speciality_Image && !My_Helper.is_Image(speciality_Image.mimetype) ) {
       throw new HttpException(My_Helper.
         FAILED_RESPONSE('image must be [.png , .jpeg , .jpg , .webp ]') , 201 ) ;
@@ -98,7 +102,8 @@ export class SpecialityService {
            {
            name : createSpecialityDto.name , 
            shortName : createSpecialityDto.shortName ,
-           description : createSpecialityDto.description
+           description : createSpecialityDto.description ,
+           level : level
            });
        
           if ( speciality_Image ) { 
@@ -153,7 +158,7 @@ export class SpecialityService {
     try {
 
 
-       speciality = await this.specialityRepo.findOne({id : speciality_Id } , {relations : ['students']});
+       speciality = await this.specialityRepo.findOne({id : speciality_Id } );
        if( speciality ) { 
 
           let modules = await this.specialityHasManyModules.find(
@@ -166,6 +171,7 @@ export class SpecialityService {
           });
 
           speciality['modules'] = modules;
+
 
         return speciality;
        }
@@ -181,9 +187,16 @@ export class SpecialityService {
 
   async update(id: number, updateSpecialityDto: UpdateSpecialityDto) {
     let speciality = await this.findSpecialityByIdoOrThrowExp(id); 
-    
+    let level;
+    if(updateSpecialityDto.level_Id) { 
+     level = await this.levelService.findOneForUpdate(level);
+    }
+    delete updateSpecialityDto.level_Id;
+
     Object.assign(speciality , updateSpecialityDto);
-    
+    if(level){
+      speciality.level = level;
+    }
     try {
       await this.specialityRepo.save(speciality);
     } catch ( e ){

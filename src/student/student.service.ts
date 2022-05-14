@@ -228,7 +228,7 @@ async deleteStudent(id : number) {
 
 
 
- async getAllStudentOfSpec( spec_Id : number ) {
+ async getAllStudentOfSpec(  spec_Id : number ) {
    
    try {
       let studentsOfSpeciality = await this.studentRep.query(`

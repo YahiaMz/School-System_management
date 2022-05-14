@@ -46,19 +46,49 @@ export class LevelService {
  async findOne ( id : number ){ 
   let level;
   try {
-      level = await this.levelRepo.findOne({id : id});
+      level = await this.levelRepo.findOne({id : id} , {relations : ['specialities']});
     } catch ( e ) { 
       throw (new HttpException(My_Helper.FAILED_RESPONSE('Something wrong !') , 201))
    } 
 
    if(!level) throw (new HttpException(My_Helper.FAILED_RESPONSE('level not Exist !') , 201))
-   
    let currentBatch = await this.levelRepo.query(`select * from batch where batch.level_Id = ${level.id}`);
+   
    level['currentBatch'] = currentBatch[0];
+   if(level.specialities.length == 0) {
+     delete level.specialities;
+     level['hasSpecialities'] = false ;
+     let sections = await this.findSectionsOfBatch(currentBatch[0].id);
+     level['sections'] = sections;
+
+   } else { 
+    level['hasSpecialities'] = true ;   
+   }
+   let studentsOfThisLevel = await this.levelRepo.query(`SELECT name , lastName , email , dateOfBirth ,profileImage,wilaya from student where student.batch_Id=${currentBatch[0].id}`)
+   level['students']=studentsOfThisLevel;
    return level;
 
 
  }
+
+
+
+ private async findSectionsOfBatch( batch_Id : number) { 
+  try {
+    
+  let sectionsOfBatch =await this.levelRepo.query(`SELECT * FROM section where section.batch_Id = ${batch_Id} and section.speciality_Id is null`);
+ return sectionsOfBatch;
+} catch (error) {
+
+  throw ( 
+
+    new HttpException(My_Helper.FAILED_RESPONSE(`Something wrong ! , $error.message}`) , 201)
+    );
+} 
+
+}
+
+
 
   async findOneForUpdate(id: number) {
     let level; 

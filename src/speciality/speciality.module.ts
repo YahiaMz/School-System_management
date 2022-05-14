@@ -6,13 +6,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Speciality } from './entities/speciality.entity';
 import { Batch } from 'src/batch/entities/batch.entity';
 import { SpecialityHasManyMoudules } from './entities/specialityHasManyModule.entity';
+import { LevelModule } from 'src/level/level.module';
 
 @Module({
   controllers: [SpecialityController],
   providers: [SpecialityService] , 
   imports : [TypeOrmModule.forFeature([Speciality , Batch , ModuleEntity  , 
-  SpecialityHasManyMoudules
-  ])] ,
+  SpecialityHasManyMoudules 
+  ]) , LevelModule] , 
   exports : [SpecialityService]
 })
 export class SpecialityModule {}
