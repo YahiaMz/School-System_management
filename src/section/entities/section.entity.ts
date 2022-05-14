@@ -5,7 +5,7 @@ import { Speciality } from "src/speciality/entities/speciality.entity";
 import { Check, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 
 @Entity()
-@Unique(["name" , "batch_Id" ]) 
+@Unique(["name" , "batch_Id" , "speciality_Id" ]) 
 
 export class Section { 
 
@@ -31,7 +31,7 @@ export class Section {
     @OneToMany(type => Group , group => group.section)
     groups : Group[];
 
-    @OneToMany(type => Student , std => std.batch ,
+    @OneToMany(type => Student , std => std.section ,
         {onDelete : 'CASCADE' , onUpdate : 'CASCADE'})
    students : Student[];
 

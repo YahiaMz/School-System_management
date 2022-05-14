@@ -46,9 +46,7 @@ async findSpeciality_In_Batch( batch_Id : number , spec_Id : number ){
   let batch = await this.batchService.findBatchByIdOrThrow_Exp(batch_Id);
   
   try {
-    let specialityInBatch = await this.sectionRepo.query(`SELECT * FROM batches_has_many_specialities where batches_has_many_specialities.batch_Id = ${batch_Id} 
-    and batches_has_many_specialities.speciality_Id = ${spec_Id} and batches_has_many_specialities.level_Id = ${batch.level}` );
-        
+    let specialityInBatch = await this.sectionRepo.query(`SELECT * FROM level inner join speciality on speciality.level_Id = level.id where level.id = ${batch.level}` );
     if(specialityInBatch.length > 0) { 
       return specialityInBatch[0];
     }
@@ -90,17 +88,23 @@ return section;
 
   async findAll(batch_Id : number , spec_Id :number) {
 
-
-
     try {
-      return await this.sectionRepo.query(`SELECT * FROM section s where batch_Id =${batch_Id} and speciality_Id = ${spec_Id}`);
-   } catch (e ) {
+    let studentsOfSpeciality =  await this.specialityRepo.query(`SELECT * FROM student where batch_Id=${batch_Id} and speciality_Id = ${spec_Id}`)
+    let sectionsOfSpeciality =  await this.sectionRepo.query(`SELECT * FROM section s where batch_Id =${batch_Id} and speciality_Id = ${spec_Id}`);
+
+    return {
+      "students" : studentsOfSpeciality,
+      "sections" : sectionsOfSpeciality
+    }
+
+    } catch (e ) {
      throw new HttpException( 
        My_Helper.FAILED_RESPONSE('something wrong while finding Section ')
       , 201) 
    }
      
   }
+
 
   async findOne(section_Id: number) {
     let section = null;
@@ -124,8 +128,7 @@ return section;
     //     section['speciality'] = spec;
     //     section['batch'] = batch;
 
-    if ( section)
-        return section
+    if ( section ) return section;
     } catch (error) {
       console.log(error.message);
       throw new HttpException(My_Helper.FAILED_RESPONSE('Something wrong , Id must be a number') , 201);     

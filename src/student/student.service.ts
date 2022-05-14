@@ -70,6 +70,8 @@ export class StudentService {
        let HashedPassword = await brcypt.hash(createStudentDto.password , this.salt);
        delete createStudentDto.password;
 
+              
+       
        let student = await this.studentRep.create({
           name : createStudentDto.name , 
           lastName : createStudentDto.lastName , 
