@@ -40,11 +40,11 @@ export class BatchController {
     }
 
 
-  @Post('/addSpeciality')
-  async addSpeciality ( @Body() addSpeciality : AddSepcialityDto ) {
-       await this.batchService.addSepciality(addSpeciality.batch_Id , addSpeciality.speciality_Id , addSpeciality.level_Id) ;
-return My_Helper.SUCCESS_RESPONSE('Speciality added with success ')
-   }
+//   @Post('/addSpeciality')
+//   async addSpeciality ( @Body() addSpeciality : AddSepcialityDto ) {
+//        await this.batchService.addSepciality(addSpeciality.batch_Id , addSpeciality.speciality_Id , addSpeciality.level_Id) ;
+// return My_Helper.SUCCESS_RESPONSE('Speciality added with success ')
+//    }
 
 
   //  @Put('/upgradeBatches')

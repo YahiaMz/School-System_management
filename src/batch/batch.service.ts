@@ -10,7 +10,6 @@ import { In, Repository } from 'typeorm';
 import { CreateBatchDto } from './dto/create-batch.dto';
 import { UpdateBatchDto } from './dto/update-batch.dto';
 import { Batch } from './entities/batch.entity';
-import { Batches_has_many_specialities } from './entities/batches_has_many_specialities.entiity';
 
 @Injectable()
 export class BatchService {
@@ -19,7 +18,6 @@ export class BatchService {
   constructor (@InjectRepository(Batch) private batchRepo : Repository<Batch>  , 
   private levelService : LevelService ,
   @InjectRepository(Speciality) private specRepo : Repository<Speciality> , 
-  @InjectRepository(Batches_has_many_specialities) private add_spec_to_batchRepo : Repository<Batches_has_many_specialities> , 
   ) {}
 
   async create(createBatchDto: CreateBatchDto) {
@@ -47,6 +45,12 @@ export class BatchService {
  async findAll( ){
 try { 
    let batches =  await this.batchRepo.find({ relations : ['level']});
+   for (let x : number =0 ; x < batches.length ; x ++ ) {
+     
+     let sectionsOfBatch = await this.batchRepo.query(`SELECT section.* , speciality.shortName from section left join speciality on speciality.id = section.speciality_Id where section.batch_Id = ${batches[x].id}`)
+    
+     batches[x]['sections'] = sectionsOfBatch;
+    }
 
     return batches;
 
@@ -88,34 +92,8 @@ try {
          {  relations : ['level', 'students']
            } );
 
-       let specialitiesOfthisBatchesInItCurrentLevel = await this.add_spec_to_batchRepo.find({
-         where : { 
-         batch : batch , 
-         in_level : batch.level
-         } , 
-         relations : ['speciality']
-         }
-         );
-
-         let specialities = [];
-         if ( specialitiesOfthisBatchesInItCurrentLevel.length>0 ) {
-
-          for (let x : number = 0 ;x < specialitiesOfthisBatchesInItCurrentLevel.length ;x ++){
-            specialities.push( specialitiesOfthisBatchesInItCurrentLevel[x].speciality);
-          }
-
-
-         batch['hasSpecialities'] = true;
-          batch['specialities'] = specialities;
-
        return batch;
-      } else { 
-        let sections = await this.findSectionsOfBatch(batch.id) ;
-        batch['hasSpecialities'] = false;
-        batch['sections'] = sections;
-      
-        return batch;
-      }
+     
 
       } catch (e) {
         console.log(e.message);
@@ -201,33 +179,33 @@ public async findBatchByIdOrThrow_Exp( id : number) {
     }
 
 
-  async addSepciality ( batch_Id : number , speciality_Id : number , level_Id : number ) { 
+  // async addSepciality ( batch_Id : number , speciality_Id : number , level_Id : number ) { 
     
-    // validating the existing of batch and speciality 
+  //   // validating the existing of batch and speciality 
     
-    let newSpec = await this.findSpecialityByIdOrThrowExp(speciality_Id);
-    let batch = await this.findBatchByIdOrThrow_Exp(batch_Id);
-    let whenAddedLevel = await this.levelService.findOneForUpdate(level_Id);  
+  //   let newSpec = await this.findSpecialityByIdOrThrowExp(speciality_Id);
+  //   let batch = await this.findBatchByIdOrThrow_Exp(batch_Id);
+  //   let whenAddedLevel = await this.levelService.findOneForUpdate(level_Id);  
     
     
-    try {
+  //   try {
       
-      let spec_batch_level_Relation = this.add_spec_to_batchRepo.create();
+  //     let spec_batch_level_Relation = this.add_spec_to_batchRepo.create();
 
-      spec_batch_level_Relation.batch = batch;
-      spec_batch_level_Relation.in_level = whenAddedLevel;
-      spec_batch_level_Relation.speciality = newSpec;
+  //     spec_batch_level_Relation.batch = batch;
+  //     spec_batch_level_Relation.in_level = whenAddedLevel;
+  //     spec_batch_level_Relation.speciality = newSpec;
 
-      await this.add_spec_to_batchRepo.save(spec_batch_level_Relation);
-      return spec_batch_level_Relation;
+  //     await this.add_spec_to_batchRepo.save(spec_batch_level_Relation);
+  //     return spec_batch_level_Relation;
 
-    } catch (error) {
-      throw new HttpException( 
-        My_Helper.FAILED_RESPONSE(`something wrong ! , err : ${error.message}`)
-         ,  
-        201
-      );
-    }
+  //   } catch (error) {
+  //     throw new HttpException( 
+  //       My_Helper.FAILED_RESPONSE(`something wrong ! , err : ${error.message}`)
+  //        ,  
+  //       201
+  //     );
+  //   }
 
 
 
@@ -235,7 +213,7 @@ public async findBatchByIdOrThrow_Exp( id : number) {
    
 
 
-  }
+  // }
 
   async increaseLevelOfBatches ( ) { 
  
@@ -271,13 +249,12 @@ public async findBatchByIdOrThrow_Exp( id : number) {
 
 
   // i am using this function in other service 
-  public async doesThisbatchHasThisSpeciality( batch_Id : number , spec_Id : number) { 
-
-  
+  public async doesThisbatchHasThisSpeciality( level_Id : number , spec_Id : number) { 
+  console.log('starting err');
+ 
     try {
       
-    let batchHasSpec = await this.add_spec_to_batchRepo.query(`SELECT * FROM batches_has_many_specialities  where batches_has_many_specialities.batch_Id = ${batch_Id} 
-     and  batches_has_many_specialities.speciality_Id = ${spec_Id}
+    let batchHasSpec = await this.batchRepo.query(`SELECT * FROM  speciality where speciality.level_Id = ${level_Id} 
     `);
 
     console.log(batchHasSpec);

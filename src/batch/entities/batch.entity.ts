@@ -26,16 +26,6 @@ export class Batch {
     @JoinColumn({name : 'level_Id'} )
     level : Level;
 
-    @ManyToMany(type => Speciality , {cascade:true , onDelete : 'CASCADE' , onUpdate : 'CASCADE'})
-    @JoinTable({ 
-        name : 'batch_has_speciality' , 
-        joinColumn: { name: 'batch_Id', referencedColumnName: 'id'},
-        inverseJoinColumn : {name : 'speciality_Id' , referencedColumnName : 'id'}
-
-    })
-    public specialities : Speciality[];
-
-
     @OneToMany(type => Student , std => std.batch ,
          {onDelete : 'CASCADE' , onUpdate : 'CASCADE'})
     students : Student[];

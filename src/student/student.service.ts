@@ -43,7 +43,7 @@ export class StudentService {
          console.log(`testing if spec ${createStudentDto.speciality_Id} in batch  ${createStudentDto.batch_Id}`);
          speciality = await this.speciality_Service.findSpecialityByIdoOrThrowExp (createStudentDto.speciality_Id);
 
-      if (speciality && !this.batchService.doesThisbatchHasThisSpeciality (createStudentDto.batch_Id , createStudentDto.speciality_Id)) { 
+      if (speciality && !this.batchService.doesThisbatchHasThisSpeciality (batch.level , createStudentDto.speciality_Id)) { 
          throw new HttpException(My_Helper.FAILED_RESPONSE('speciality does not exist in this level') , 200);
       }   
       
@@ -281,4 +281,7 @@ async updateProfileImage ( student_Id : number , file : Express.Multer.File ) {
    delete student.password;
  return student;
  }
+
+
+
 }
