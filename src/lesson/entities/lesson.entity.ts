@@ -8,9 +8,12 @@ import { Check, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, Primary
 
 @Entity()
 @Check(`"day" > 0 and "day < 6"`)
-@Check(`"lesson_Type" = "TD" or "lesson_Type" = "TP" , "lesson_Type" = "COURS"`)
+@Check(`"lesson_Type" = "TD" or "lesson_Type" = "TP" or "lesson_Type" = "COURS"`)
+@Check(`startingTime < endingTime`)
 @Unique(["day" , "teacher" , "startingTime" , "module"])
 @Unique(["day" , "sale" , "group" , "startingTime"])
+
+
 export class Lesson {
     @PrimaryGeneratedColumn()
     id : number;
@@ -19,6 +22,9 @@ export class Lesson {
     day : number;
   
 
+    @Column({type :'tinyint',default : 1, nullable : false , unsigned : true})
+    semester : number;
+  
     @Column({type :'varchar' , length : '10'})
     lesson_Type : string;
  // lessonType =  ( lessonType )? TD , COURS 

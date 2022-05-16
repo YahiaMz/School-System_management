@@ -49,32 +49,84 @@ try {
   lesson.teacher = teacher;
   lesson.group = group;
   lesson.module = mModule;
- lesson.section = section;
+  lesson.section = section;
 
   let newLesson = await this.lessonRepository.save(lesson);
   return newLesson;
   } catch (error) {
     console.log(error.message);
-    
   throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong ! , { '+error.message+' }') , 201);
 }
 
   }
 
-async  findAll_LessonsOfSection( section_Id  : number ) {
+async  findAll_LessonsOfSection( section_Id  : number , semester : number) {
+  console.log(section_Id);
+  
 let section = await this.sectionService.findSectionByIdOrThrowException(section_Id);
  try {
-   let lessons = await this.lessonRepository.find({ 
+   let lessonsOfSunday = await this.lessonRepository.find({ 
      where : {
-       section : section 
+       section : section ,
+       day : 1 ,
+       semester : semester
      }, 
      relations : ['teacher' , 'group' , 'sale' , 'module' ]
    })
- 
+  
+
+   let lessonsOfMonday = await this.lessonRepository.find({ 
+    where : {
+      section : section ,
+      day : 2,
+      semester : semester
+
+    }, 
+    relations : ['teacher' , 'group' , 'sale' , 'module' ]
+  })
+
+  let lessonsOfTuesDay = await this.lessonRepository.find({ 
+    where : {
+      section : section ,
+      day : 3 ,
+      semester : 1
+
+    }, 
+    relations : ['teacher' , 'group' , 'sale' , 'module' ]
+  })
+
+  let lessonsOfWednesday = await this.lessonRepository.find({ 
+    where : {
+      section : section ,
+      day : 4 ,
+      semester : semester
+
+    }, 
+    relations : ['teacher' , 'group' , 'sale' , 'module' ]
+  })
+
+
+  let lessonsOfThursDay = await this.lessonRepository.find({ 
+    where : {
+      section : section ,
+      day : 5 ,
+      semester : semester
+    }, 
+    relations : ['teacher' , 'group' , 'sale' , 'module' ]
+  })
+
+
+  let lessons = {
+    "sunday" : lessonsOfSunday ,
+    "monday" : lessonsOfMonday ,
+    "tuesday" : lessonsOfTuesDay,
+    "wednesday" : lessonsOfWednesday,
+    "thursday" : lessonsOfThursDay
+  }
+
    return lessons;
  } catch (error) {
   throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong') , 201);
-
  }
 
   }
@@ -125,7 +177,11 @@ async update(id: number, updateLessonDto: UpdateLessonDto) {
 
 
  Object.assign(lesson , updateLessonDto);
- return await this.lessonRepository.save(lesson);
+ try {
+  return await this.lessonRepository.save(lesson);
+ } catch (error) {
+  throw new HttpException(My_Helper.FAILED_RESPONSE(`something wrong : ${error.message}`) , 201);
+ }
 
   }
 

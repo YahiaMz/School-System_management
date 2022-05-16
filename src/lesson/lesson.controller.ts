@@ -4,7 +4,7 @@ import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
 import { My_Helper } from 'src/MY-HELPER-CLASS';
 
-@Controller('lesson')
+@Controller('lessons')
 export class LessonController {
   constructor(private readonly lessonService: LessonService) {}
 
@@ -14,19 +14,31 @@ export class LessonController {
     return My_Helper.SUCCESS_RESPONSE(newLesson);
   }
 
-  @Get('/all')
-  async findAll(@Body('timeTable_Id') timeTable_Id : number) {
+  @Get('/allOfSection=:section_Id/inSemester=:semester')
+  async findAll(@Param('section_Id') section_Id : string , @Param('semester') semester : string) {
     
 
-    if (timeTable_Id && isNaN( timeTable_Id ) ) { 
+    console.log(section_Id);
+    
+
+    if (section_Id && isNaN(+ section_Id ) ) { 
       return {
         success : false , 
-        message : 'timeTable_Id must be an integer'
+        message : 'section_Id must be an integer'
       }
-    }
+    } 
 
-    let lessonsOfTimeTable = await this.lessonService.findAll_LessonsOfSection(timeTable_Id);
-    return My_Helper.SUCCESS_RESPONSE(lessonsOfTimeTable);
+
+    if (semester && isNaN( + semester ) ) { 
+      return {
+        success : false , 
+        message : ' semester must = { 1 or 2 }  '
+      }
+    } 
+
+
+    let lessonsOfSection = await this.lessonService.findAll_LessonsOfSection(+section_Id  ,+semester);
+    return My_Helper.SUCCESS_RESPONSE(lessonsOfSection);
   }
 
   // @Get(':id')

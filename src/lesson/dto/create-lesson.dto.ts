@@ -1,8 +1,10 @@
-import { IsIn, IsInt, IsOptional, IsString } from "class-validator";
+import { IsIn, IsInt, IsOptional, IsString, Max, Min } from "class-validator";
 
 export class CreateLessonDto {
 
     @IsInt()
+    @Max(5)
+    @Min(1)
     day : number;
 
     @IsString()
@@ -28,7 +30,13 @@ export class CreateLessonDto {
     @IsInt()
     module_Id : number;
 
-
     @IsInt()
     section_Id : number;
+
+    @IsInt()
+    @Max(2)
+    @Min(1)
+    semester : number;
+
+    
 }
