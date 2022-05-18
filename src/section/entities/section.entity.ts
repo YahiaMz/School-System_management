@@ -1,6 +1,6 @@
 import { group } from "console";
 import { Group } from "src/group/entities/group.entity";
-import { Student } from "src/module/student.entity";
+import { Student } from "src/student/student.entity";
 import { Speciality } from "src/speciality/entities/speciality.entity";
 import { Check, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 

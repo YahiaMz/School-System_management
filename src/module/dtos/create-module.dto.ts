@@ -1,9 +1,15 @@
-import { IsInt, IsNumberString, IsString, Max, Min } from "class-validator";
+import { IsInt, IsNumber, IsNumberString, IsOptional, IsString, Max, Min } from "class-validator";
 
 export class CreateModuleDto {
 
-    @IsNumberString()
+    @IsNumber()
     level_Id : number;
+
+
+    @IsNumber()
+    @IsOptional()
+    speciality_Id : number;
+
 
     @IsInt()
     @Max(2)
@@ -12,6 +18,10 @@ export class CreateModuleDto {
 
     @IsString()
     name : string;
+
+    @IsInt()
+    coef : number;
+
       
     @IsString( )
     shortName : string;

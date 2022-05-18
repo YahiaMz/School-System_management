@@ -10,12 +10,14 @@ import { createWriteStream } from 'fs';
 import { join } from 'path';
 const fs = require('fs')
 import { updateModuleDto } from './dtos/updateModule.dto';
+import { SpecialityService } from 'src/speciality/speciality.service';
 
 @Injectable()
 export class ModuleService {
 
 constructor( @InjectRepository(Module) private moduleRepository : Repository<Module> , 
-             @InjectRepository(Level) private levelRepo : Repository<Level>
+             @InjectRepository(Level) private levelRepo : Repository<Level> , 
+             private specialityService :  SpecialityService 
 ){}
 
 
@@ -23,7 +25,7 @@ constructor( @InjectRepository(Module) private moduleRepository : Repository<Mod
  private async findLevelByIdOrThrowExp ( level_Id : number) { 
 
     try {
-        let level = await this.levelRepo.findOne({id : level_Id});
+        let level = await this.levelRepo.findOne({id : level_Id} , {relations :['specialities']});
         if ( level ) return level;
     } catch (error) {
         throw new HttpException ( 
@@ -39,10 +41,38 @@ constructor( @InjectRepository(Module) private moduleRepository : Repository<Mod
 
     async createModule ( moduleInfo : CreateModuleDto , image : Express.Multer.File  ){
          
-               console.log(image);
+      console.log(moduleInfo);
+      
 
         let level = await this.findLevelByIdOrThrowExp(moduleInfo.level_Id);
-        
+        let speciality = null;
+        if(moduleInfo.speciality_Id) {
+            speciality = await this.specialityService.findSpecialityByIdoOrThrowExp(moduleInfo.speciality_Id);
+           
+            let specialityFoundInThisLevel = false;
+            for ( let x = 0 ; x < level.specialities.length ; x ++ ) {
+                if(level.specialities[x].id == speciality.id) {
+                    specialityFoundInThisLevel = true;
+                    break;
+                }
+            }
+
+            if(!specialityFoundInThisLevel) {
+                throw new HttpException( 
+                    My_Helper.FAILED_RESPONSE('this speciality does not exist in this level ') , 
+                    201
+                )          
+              }
+        } else {
+            if (level.specialities.length > 0) {
+                throw new HttpException( 
+                    My_Helper.FAILED_RESPONSE('this level has specialities , so you must enter speciality_Id ') , 
+                    201
+                )         
+            }
+        }
+
+    
         if( image && !My_Helper.is_Image(image.mimetype))  { 
             throw new HttpException( My_Helper.
                 FAILED_RESPONSE('image must be a [.png , .jpeg , .jpg , .webp]') , 201)
@@ -55,12 +85,16 @@ constructor( @InjectRepository(Module) private moduleRepository : Repository<Mod
                 let mModule =  this.moduleRepository.create({
                  semester : moduleInfo.semester , 
                  name : moduleInfo.name , 
+                 coef : moduleInfo.coef,
                  shortName : moduleInfo.shortName , 
                  description : moduleInfo.description , 
              }); 
 
              
+             delete level.specialities;
              mModule.level = level;
+             if(speciality)
+             mModule.speciality = speciality;
              
              if(image) { 
 
@@ -72,13 +106,13 @@ constructor( @InjectRepository(Module) private moduleRepository : Repository<Mod
              
             }
 
-             await this.moduleRepository.save(mModule)
+             await this.moduleRepository.save(mModule);
              return mModule;
 
         } catch ( e ) { 
             throw new HttpException({ 
              success : false , 
-             message : 'Module name exist in database !' , 
+             message : 'Module name exist in database !'  , 
             } , 201)
         }
 

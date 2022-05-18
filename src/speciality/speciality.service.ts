@@ -4,11 +4,9 @@ import { Batch } from 'src/batch/entities/batch.entity';
 import { Module } from 'src/module/module.entity';
 import { My_Helper } from 'src/MY-HELPER-CLASS';
 import {  Repository } from 'typeorm';
-import { AddModuleToSpecialityDto } from './dto/addModuleToSpeciality.dto';
 import { CreateSpecialityDto } from './dto/create-speciality.dto';
 import { UpdateSpecialityDto } from './dto/update-speciality.dto';
 import { Speciality } from './entities/speciality.entity';
-import { SpecialityHasManyMoudules } from './entities/specialityHasManyModule.entity';
 import path = require('path');
 import { v4 as uuidv4 } from 'uuid';
 import { createWriteStream, fstat } from 'fs';
@@ -23,7 +21,6 @@ export class SpecialityService {
   constructor(@InjectRepository(Speciality) private specialityRepo : Repository<Speciality> , 
       @InjectRepository(Batch) private batchRepo : Repository<Batch> ,
       @InjectRepository(Module) private moduleRepo : Repository<Module>  , 
-      @InjectRepository(SpecialityHasManyMoudules) private specialityHasManyModules : Repository<SpecialityHasManyMoudules> ,
       private levelService : LevelService
   ) {
     
@@ -155,24 +152,18 @@ export class SpecialityService {
 
  async  findOne(speciality_Id: number) {
     let speciality;
+    
     try {
+       speciality = await this.specialityRepo.findOne({id : speciality_Id } , {relations : ['modules', "level"] } );
+    
+       if( speciality ) {
+        let level = await this.levelService.findLevelByIdWithItCurrentBatchOrThrowExp(speciality.level.id); 
+        let currentBatch = level.currentBatch;
 
-
-       speciality = await this.specialityRepo.findOne({id : speciality_Id } );
-       if( speciality ) { 
-
-          let modules = await this.specialityHasManyModules.find(
-          {
-            select : ['coef' , 'module'] ,
-            where : {
-              speciality : speciality
-            } ,
-            relations : ['module' ]
-          });
-
-          speciality['modules'] = modules;
-
-
+        let sectionOfThisSpeciality = await this.batchRepo.query(`SELECT * from section where speciality_Id = ${speciality_Id} and batch_Id = ${currentBatch.id}`)
+        delete speciality.level;
+        
+        speciality['sections'] = sectionOfThisSpeciality;
         return speciality;
        }
       } catch (error) {
@@ -236,39 +227,6 @@ export class SpecialityService {
 
 
 
-  async addModule ( addModuleToSpecDto : AddModuleToSpecialityDto) { 
-
-
-   let speciality = await this.findSpecialityByIdoOrThrowExp(addModuleToSpecDto.speciality_Id);
-   let mModule = await this.findModuleByIdOrThrowExp(addModuleToSpecDto.module_Id);
-
-   try {
-     let specialityHasManyModules = this.specialityHasManyModules.create({
-       coef : addModuleToSpecDto.coef,
-      // semester : addModuleToSpecDto.semester ,
-     });
-
-     specialityHasManyModules.speciality = speciality;
-     specialityHasManyModules.module = mModule;
-     let addedModuleToSpeciality = await this.specialityHasManyModules.save(specialityHasManyModules);
-     
-     
-     mModule['coef'] = addedModuleToSpeciality.coef;
-    // mModule['semester'] = addedModuleToSpeciality.semester;
-
-     speciality.newModule = mModule;
-     return speciality;
-
-
-   } catch (err) {
-        console.log(err.message);
-        
-    throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong') , 201);
-   }
-
-  }
-
-
   async sendImage( imageName : string , @Res() res ) {
     try {
       let file = await res.sendFile(join(process.cwd() , My_Helper.specialitiesImagesPath+imageName));         
@@ -313,6 +271,31 @@ export class SpecialityService {
         SELECT * FROM section where section.id = ${section_Id} and section.
         `)
  }
+
+
+
+
+ async  findSpecialityWithItsSections(speciality_Id: number , batch_Id : number) {
+  let speciality;
+  try {
+    
+    speciality = await this.specialityRepo.findOne({id : speciality_Id } , {relations : ['modules']} );
+     if( speciality ) { 
+       let sectionsOfSpeciality = await this.batchRepo.query(`
+       SELECT * FROM section where section.batch_Id = ${batch_Id} and section.speciality_Id = ${speciality_Id}`)
+      return speciality;
+     }
+    } catch (error) {
+
+     throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong') , 201);
+  }
+
+  if (!speciality) { 
+    throw new HttpException(My_Helper.FAILED_RESPONSE('Speciality not found !') , 201);
+  }
+}
+
+
 
 
 }

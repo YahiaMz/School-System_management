@@ -1,6 +1,6 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Student } from 'src/module/student.entity';
+import { Student } from './student.entity';
 import { Repository } from 'typeorm';
 import { LoginStudentDto } from './dtos/student-login.dto';
 import * as brcypt from 'bcrypt';

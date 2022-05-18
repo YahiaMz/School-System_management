@@ -15,14 +15,13 @@ import { LessonModule } from './lesson/lesson.module';
 import { Level } from './level/entities/level.entity';
 import { LevelModule } from './level/level.module';
 import { ModuleModule } from './module/module.module';
-import { Student } from './module/student.entity';
+import { Student } from './student/student.entity';
 import { New } from './new/entities/new.entity';
 import { NewModule } from './new/new.module';
 import { Sale } from './sale/entities/sale.entity';
 import { SaleModule } from './sale/sale.module';
 import { SectionModule } from './section/section.module';
 import { Speciality } from './speciality/entities/speciality.entity';
-import { SpecialityHasManyMoudules } from './speciality/entities/specialityHasManyModule.entity';
 import { SpecialityModule } from './speciality/speciality.module';
 import { StudentModule } from './student/student.module';
 import { Teacher } from './teacher/teacher.entity';
@@ -65,7 +64,7 @@ const railwayDb = {
     entities: [
       Teacher , Admin , ModuleEntity , 
       Student  , Batch , Level , Speciality , 
-      Group , SpecialityHasManyMoudules ,
+      Group  ,
       New , Chapter , Timetable ,
        Lesson , Sale
     ],

@@ -1,5 +1,5 @@
 import { group } from "console";
-import { Student } from "src/module/student.entity";
+import { Student } from "src/student/student.entity";
 import { New } from "src/new/entities/new.entity";
 import { Section } from "src/section/entities/section.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
@@ -36,7 +36,6 @@ section : Section;
     onUpdate : 'CASCADE'
 })
 news  :New[];
-
 
 @OneToMany(type => Student  , Student => Student.group )
 students : Student[];

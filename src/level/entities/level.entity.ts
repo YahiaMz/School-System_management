@@ -1,4 +1,6 @@
+import { type } from "os";
 import { Batch } from "src/batch/entities/batch.entity";
+import { Module } from "src/module/module.entity";
 import { Speciality } from "src/speciality/entities/speciality.entity";
 import { Column, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
@@ -20,10 +22,14 @@ export class Level {
     @UpdateDateColumn()
     updated_at: string;
 
-
     @OneToMany(type => Speciality , spec => spec.level )
     specialities : Speciality[];
     
+    @OneToOne(type => Batch , batch => batch.level , {nullable : true})
+    currentBatch : Batch;
+
+    @OneToMany(type => Module , mdl => mdl.level )
+    modules : Module[];
 
 }
 

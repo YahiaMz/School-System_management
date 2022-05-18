@@ -18,7 +18,14 @@ export class LevelController {
     return  My_Helper.SUCCESS_RESPONSE(await this.levelService.findAll());
   }
 
-  
+  @Get('/all/WithDetails')
+  async getAllLevelsWithThereSpecialitiesOrSections ( ) {
+    
+    let levels = await this.levelService.findLevelsWithSpecialitiesOrSections();
+    return My_Helper.SUCCESS_RESPONSE(levels);
+   }
+
+
   @Get('/:id')
   async findLevelAndItCurrentBatch(@Param('id') level_Id ) {
     return  My_Helper.SUCCESS_RESPONSE(await this.levelService.findOne(+level_Id));
@@ -36,4 +43,8 @@ export class LevelController {
     await this.levelService.remove(+id);
   return My_Helper.SUCCESS_RESPONSE('level removed with success ');
   }
+
+
+
+
 }

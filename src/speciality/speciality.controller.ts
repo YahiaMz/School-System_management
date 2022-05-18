@@ -50,11 +50,6 @@ export class SpecialityController {
   
   }
 
-@Post('/addModule')
-  async addModuleToSpeciality( @Body() addModuleToSpecDto : AddModuleToSpecialityDto) { 
-    let speciality = await this.specialityService.addModule(addModuleToSpecDto);
-    return My_Helper.SUCCESS_RESPONSE( speciality );
-  }
 
 @Post('update_image/:id')
 @UseInterceptors(FileInterceptor('image'))

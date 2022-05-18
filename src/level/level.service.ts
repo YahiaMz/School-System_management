@@ -106,6 +106,24 @@ export class LevelService {
 
   }
 
+
+
+  async findLevelByIdWithItCurrentBatchOrThrowExp(id: number) {
+    let level; 
+    try {
+        level = await this.levelRepo.findOne({id : id }, {relations : ['currentBatch']} );
+     } catch (error) {
+       throw (new HttpException(My_Helper.FAILED_RESPONSE('something wrong !') , 201))
+     }
+
+     if ( !level) { 
+       throw new HttpException( My_Helper.FAILED_RESPONSE('level not found !') , 201);
+     }
+     return (level);
+
+  }
+
+
   async update(id: number, updateLevelDto: UpdateLevelDto) {
      let level = await this.findOneForUpdate(id);
      Object.assign(level ,updateLevelDto );
@@ -157,6 +175,34 @@ export class LevelService {
       throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong while getting levels ordered by level DESC') , 201) 
     }
   }
+
+
+  public async findLevelsWithSpecialitiesOrSections( ) { 
+    let levels;
+    
+    try {
+        levels = await this.levelRepo.find( {relations : ['specialities',"currentBatch","modules"]});
+      } catch ( e ) { 
+        throw (new HttpException(My_Helper.FAILED_RESPONSE('Something wrong ! ') , 201))
+     } 
+     
+     for (let x = 0 ; x<levels.length ; x ++  ) {
+      
+      if(levels[x].specialities.length == 0) {
+        delete levels[x].specialities;
+        levels[x]['hasSpecialities'] = false ;
+        let sections = await this.findSectionsOfBatch(levels[x].currentBatch.id);
+        levels[x]['sections'] = sections;
+      } else { 
+       levels[x]['hasSpecialities'] = true ;   
+       delete levels[x].modules;
+      }
+     }
+
+     return levels;
+  
+  }
+
 
 
 
