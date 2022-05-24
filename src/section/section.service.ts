@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BatchService } from 'src/batch/batch.service';
+import { GroupService } from 'src/group/group.service';
 import { My_Helper } from 'src/MY-HELPER-CLASS';
 import { Speciality } from 'src/speciality/entities/speciality.entity';
 import { Repository } from 'typeorm';
@@ -13,7 +14,8 @@ export class SectionService {
 
   constructor (@InjectRepository(Section) private sectionRepo : Repository<Section> , 
   @InjectRepository(Speciality) private specialityRepo : Repository<Speciality>  , 
-  private batchService : BatchService
+  private batchService : BatchService , 
+  private groupService  : GroupService
   ) { }
 
 
@@ -90,6 +92,14 @@ return section;
 
     try {
     let studentsOfSpeciality =  await this.specialityRepo.query(`SELECT * FROM student where batch_Id=${batch_Id} and speciality_Id = ${spec_Id}`)
+  
+    for (let x = 0 ; x < studentsOfSpeciality.length ; x ++) { 
+      let groupWithSection = await this.groupService.findGroupWithHimSection(studentsOfSpeciality[x].group_Id);
+       studentsOfSpeciality[x]['section'] = groupWithSection.section;
+       delete groupWithSection.section;
+       studentsOfSpeciality[x]['group'] = groupWithSection;
+    }
+
     let sectionsOfSpeciality =  await this.sectionRepo.query(`SELECT * FROM section s where batch_Id =${batch_Id} and speciality_Id = ${spec_Id}`);
 
     return {
@@ -114,9 +124,10 @@ return section;
         where : {id : section_Id},
         relations : [
          "groups" ,
-         "students"
       ]
        });
+
+
 
        
 
@@ -128,7 +139,24 @@ return section;
     //     section['speciality'] = spec;
     //     section['batch'] = batch;
 
-    if ( section ) return section;
+    if ( section ) {
+    
+      let studentOfThisSection = await this.sectionRepo.query(`select * from student where student.section_Id = ${section.id}`);
+    
+      for (let x = 0 ; x < studentOfThisSection.length ; x ++) { 
+        let groupWithSection = await this.groupService.findGroupWithHimSection(studentOfThisSection[x].group_Id);
+         studentOfThisSection[x]['section'] = groupWithSection.section;
+         delete groupWithSection.section;
+         delete studentOfThisSection[x].password;
+         
+         studentOfThisSection[x]['group'] = groupWithSection;
+      }
+    
+      section['students'] = studentOfThisSection;
+
+      return section;
+    
+    }
     } catch (error) {
       console.log(error.message);
       throw new HttpException(My_Helper.FAILED_RESPONSE('Something wrong , Id must be a number') , 201);     

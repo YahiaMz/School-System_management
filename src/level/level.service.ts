@@ -1,5 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { group } from 'console';
+import { GroupService } from 'src/group/group.service';
 import { My_Helper } from 'src/MY-HELPER-CLASS';
 import { Repository } from 'typeorm';
 import { CreateLevelDto } from './dto/create-level.dto';
@@ -10,7 +12,8 @@ import { Level } from './entities/level.entity';
 export class LevelService {
 
 
-  constructor(@InjectRepository(Level) private levelRepo : Repository<Level> , 
+  constructor(@InjectRepository(Level) private levelRepo : Repository<Level> ,
+              private groupService : GroupService 
   ) { }
 
  async create(createLevelDto: CreateLevelDto) {
@@ -65,8 +68,17 @@ export class LevelService {
    } else { 
     level['hasSpecialities'] = true ;   
    }
-   let studentsOfThisLevel = await this.levelRepo.query(`SELECT name , lastName , email , dateOfBirth ,profileImage,wilaya from student where student.batch_Id=${currentBatch[0].id}`)
-   level['students']=studentsOfThisLevel;
+    let studentsOfThisLevel = await this.levelRepo.query(`SELECT name , lastName , email , dateOfBirth ,profileImage , wilaya , group_Id 
+     from student where student.batch_Id=${currentBatch[0].id}`)
+   
+  level['students']=studentsOfThisLevel;
+  for (let x = 0 ; x < studentsOfThisLevel.length ; x ++) { 
+    let groupWithSection = await this.groupService.findGroupWithHimSection(studentsOfThisLevel[x].group_Id);
+     studentsOfThisLevel[x]['section'] = groupWithSection.section;
+     delete groupWithSection.section;
+     studentsOfThisLevel[x]['group'] = groupWithSection;
+  }
+
    return level;
 
 

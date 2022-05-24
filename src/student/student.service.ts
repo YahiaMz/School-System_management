@@ -166,6 +166,10 @@ async updateStudent( id : number, updateStudent : UpdateStudentDto ) {
          let group = await this.groupService.findGroupByIdOrThrowExp(updateStudent.group_Id);
          student.group = group;
      }
+     if(updateStudent.section_Id) { 
+        let section = await this.sectionService.findSectionByIdOrThrowException(updateStudent.section_Id);
+        student.section = section;
+      }
 
      if (updateStudent.password) {
          let hashedPassword = await brcypt.hash(updateStudent.password , this.salt);

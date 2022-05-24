@@ -110,6 +110,21 @@ async findOne(id: number) {
   throw new HttpException(My_Helper.FAILED_RESPONSE('group not found') , 201);
   }
 
+
+  async findGroupWithHimSection(id: number) {
+    try {
+      let group = await this.groupRepository.findOne(
+       { 
+       where : {id : id},
+       relations : ['section']
+       }   );
+      if (group) return group;
+     } catch (error) {
+       throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong ' ) , 201);
+     }
+     throw new HttpException(My_Helper.FAILED_RESPONSE('group not found') , 201);
+     }
+
   async update(id: number , updateGroupDto: UpdateGroupDto) {
 
 
