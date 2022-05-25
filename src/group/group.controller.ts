@@ -15,12 +15,15 @@ export class GroupController {
 
   @Get('/all/ofSection=:section_Id')
   async findAll( @Param('section_Id') section_Id : number ) {
+    console.log(section_Id);
    let groups = await this.groupService.findAll(section_Id);
    return My_Helper.SUCCESS_RESPONSE(groups);
   }
 
-  @Get('/:id')
+  @Get(':id')
   findOne(@Param('id') id: string) {
+    console.log('id ' + id);
+    
     return this.groupService.findOne(+id);
   }
 

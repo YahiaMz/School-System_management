@@ -25,7 +25,6 @@ export class SectionController {
 
   @Get('/allOfbatch/:batch_Id')
   async findAllSectionOfBatch(@Param('batch_Id') batch_Id : string ) {
-    console.log(batch_Id);
     
     let sections = await this.sectionService.findSectionsByBatch_Id(+batch_Id);
    return My_Helper.SUCCESS_RESPONSE(sections);

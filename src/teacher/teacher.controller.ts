@@ -54,8 +54,8 @@ export class TeacherController {
 
     @Patch('/update/:id') 
     async updateTeacher( @Param('id') teacherId : number, @Body() body : UpdateTeacherDto) {
-        let updatedAdmin = await this.teacherService.updateTeacher(teacherId,body);
-        return My_Helper.SUCCESS_RESPONSE('teacher information updated with success')
+        let updatedTeacher = await this.teacherService.updateTeacher(teacherId,body);
+        return My_Helper.SUCCESS_RESPONSE(updatedTeacher)
      }
 
 
@@ -73,7 +73,7 @@ export class TeacherController {
      async updateProfilePicture(@Param('id')  teacher_Id , @UploadedFile() file : Express.Multer.File ){ 
               
         let uTeacher =  await this.teacherService.updateProfilePicture(+teacher_Id , file);
-     return My_Helper.SUCCESS_RESPONSE(uTeacher);
+        return My_Helper.SUCCESS_RESPONSE(uTeacher);
     }  
 
     @Get('/profile-images/:profileImage')

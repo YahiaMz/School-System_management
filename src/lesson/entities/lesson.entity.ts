@@ -30,10 +30,10 @@ export class Lesson {
  // lessonType =  ( lessonType )? TD , COURS 
 
     @Column({type : 'time'})
-     startingTime : string;
+    startingTime : string;
 
      @Column({type : 'time'})
-     endingTime : string;
+    endingTime : string;
 
 
     @CreateDateColumn()

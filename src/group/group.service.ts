@@ -35,7 +35,7 @@ export class GroupService {
          let section = await this.sectionRepo.findOne({id : id});
          if ( section ) return section;
        } catch (error) {
-          throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong ' ) , 201);
+          throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong ' + error.message ) , 201);
        }
 
        throw new HttpException(My_Helper
@@ -90,7 +90,7 @@ export class GroupService {
         
       return groups;
     } catch (error) {
-      throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong ' ) , 201);
+      throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong ') , 201);
     }
 
     
