@@ -54,7 +54,8 @@ export class SaleService {
           Object.assign(sale , updateSaleDto);
 
     try {
-          return await this.saleRepository.save(sale);
+          let newSale = await this.saleRepository.save(sale);
+          return newSale;
         } catch (error) {
           throw new HttpException(My_Helper.FAILED_RESPONSE('sale name Exist') , 201);
         }

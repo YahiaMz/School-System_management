@@ -23,7 +23,7 @@ export class SaleController {
   @Patch('/update/:id')
   async update(@Param('id') id: string, @Body() updateSaleDto: UpdateSaleDto) {
     let updatedSale = await this.saleService.update( +id , updateSaleDto);
-    return My_Helper.SUCCESS_RESPONSE(updateSaleDto);
+    return My_Helper.SUCCESS_RESPONSE(updatedSale);
     }
 
   @Delete('/delete/:id')
