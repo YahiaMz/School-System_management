@@ -54,7 +54,6 @@ export class LessonController {
 
 
 
-
   @Patch('/update/:id')
   update(@Param('id') id: string, @Body() updateLessonDto: UpdateLessonDto) {
     return this.lessonService.update(+id, updateLessonDto);

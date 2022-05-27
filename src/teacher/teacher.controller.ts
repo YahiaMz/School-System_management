@@ -88,4 +88,11 @@ export class TeacherController {
     return My_Helper.SUCCESS_RESPONSE(modules);
     }
 
+    @Get('/:id/groups')
+    async TeacherGroups(@Param('id') id: string) {
+      let groups =  await this.teacherService.teacherGroups(+id);
+      return My_Helper.SUCCESS_RESPONSE(groups);
+    }
+  
+
 }

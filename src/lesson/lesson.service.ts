@@ -234,7 +234,7 @@ async update(id: number, updateLessonDto: UpdateLessonDto) {
 async teacherSchedule(teacher_Id : number) {
   let teacher = await this.teacherService.findTeacherByIdOrThrowExp(teacher_Id);
 try {
-   let teacherLessons = await this.lessonRepository.find({select : [ 'id','day' ,'startingTime', 'endingTime' , 'lesson_Type' ,] ,where : {teacher : teacher} , relations : ['teacher', "module",'group', "sale" ]} );
+   let teacherLessons = await this.lessonRepository.find({select : [ 'id','day' ,'startingTime','semester', 'endingTime' , 'lesson_Type' ,] ,where : {teacher : teacher} , relations : ['teacher', "module",'group', "sale" ]} );
    
    let sunday = teacherLessons.filter(({day}) => day == 1);
    let monday = teacherLessons.filter(({day}) => day == 2);
@@ -257,6 +257,20 @@ try {
 }
 
 }
+
+
+async teacherGroups(teacher_Id : number) {
+  let teacher = await this.teacherService.findTeacherByIdOrThrowExp(teacher_Id);
+try {
+   let teacherLessons = await this.lessonRepository.query("select distinct g.* ,s.name as 'inSection' , l.name as 'inLevel'  from lesson,`group` g ,`section` s, `level` l , batch b where g.id = lesson.group_Id and g.section_Id = s.id and s.batch_Id = b.id and b.level_Id = l.id  and lesson.teacher_Id ="+teacher.id );
+    return teacherLessons;
+} catch (error) {
+   throw new HttpException(My_Helper.FAILED_RESPONSE(' something wrong ' + error.message) , 201);
+}
+
+}
+
+
 
 
 

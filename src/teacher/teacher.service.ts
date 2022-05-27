@@ -235,13 +235,34 @@ export class TeacherService {
 
      async modulesOfTeacher(teacher_Id : number) {
          let teacher = await this.findTeacherByIdOrThrowExp(teacher_Id);
-
-         let modules = this.teacherRepository.query(`SELECT  m.* from teacher t  inner join lesson l on
+ 
+         try {
+         
+         let modules = await this.teacherRepository.query(`SELECT  m.* from teacher t  inner join lesson l on
           l.teacher_Id = t.id  INNER JOIN module m 
          on l.module_Id  = m.id where l.teacher_Id = ${teacher_Id} GROUP BY m.id ;`)
 
             return modules;
-        }
+         }
+    
+          catch (error) {
+             
+         }
+    }
+
+
+async teacherGroups(teacher_Id : number) {
+    let teacher = await this.findTeacherByIdOrThrowExp(teacher_Id);
+  try {
+     let teacherLessons = await this.teacherRepository.query("select distinct g.* ,s.name as 'inSection' , l.name as 'inLevel'  from lesson,`group` g ,`section` s, `level` l , batch b where g.id = lesson.group_Id and g.section_Id = s.id and s.batch_Id = b.id and b.level_Id = l.id  and lesson.teacher_Id ="+teacher.id );
+      return teacherLessons;
+  } catch (error) {
+     throw new HttpException(My_Helper.FAILED_RESPONSE(' something wrong ' + error.message) , 201);
+  }
+  
+  }
+  
+
 
 
 }
