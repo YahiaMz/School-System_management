@@ -28,14 +28,29 @@ export class GroupService {
     throw new HttpException(My_Helper.FAILED_RESPONSE(`group not found`) , 201);
   
   }
+
   
+  private async findSectionAndItBatchAndItSpecialityIfExistByIdOrThrowExp( id : number ) { 
+    try {
+      let section = await this.sectionRepo.findOne({id : id} , {relations : ['batch', 'speciality']});
+      if ( section ) return section;
+    } catch (error) {
+       throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong ') , 201);
+    }
+
+    throw new HttpException(My_Helper
+     .FAILED_RESPONSE('section not found ') , 201) 
+
+}
+
+
 
   private async findSectionByIdOrThrowExp( id : number ) { 
        try {
          let section = await this.sectionRepo.findOne({id : id});
          if ( section ) return section;
        } catch (error) {
-          throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong ' + error.message ) , 201);
+          throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong ') , 201);
        }
 
        throw new HttpException(My_Helper
@@ -157,6 +172,27 @@ async findOne(id: number) {
     return group;
     
   }
+
+
+  async findGroupAndItSectionWithItLevel ( id : number) { 
+          let groupWithSection = await this.findGroupWithHimSection(id);
+          let section = await this.findSectionAndItBatchAndItSpecialityIfExistByIdOrThrowExp(groupWithSection.id);
+          
+          // groupWithSection['inSection'] = section.name;
+        
+          // if(section.speciality != null)
+          // groupWithSection['inSpeciality'] = section.speciality.shortName ? section.speciality.shortName : section.speciality.name;
+          // else 
+          // groupWithSection['inSpeciality'] = false;
+
+          // groupWithSection['inBatch'] = section.batch.name;
+
+          // delete groupWithSection.section;
+          // groupWithSection['section'] = section;
+
+          return groupWithSection;
+        }
+
 
 
 }

@@ -2,15 +2,16 @@ import { trace } from "console";
 import { Level } from "src/level/entities/level.entity";
 import { Module } from "src/module/module.entity";
 import { Student } from "src/student/student.entity";
-import { Column, CreateDateColumn, Entity,  JoinColumn,  ManyToOne,  OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity,  JoinColumn,  ManyToOne,  OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 
 @Entity()
+@Unique(['name' , 'level'])
 export class Speciality 
 {
     @PrimaryGeneratedColumn({type : 'bigint' , unsigned : true})
     id : number;
 
-    @Column({type : 'varchar' ,length : 50 , unique : true , nullable : false})
+    @Column({type : 'varchar' ,length : 50  , nullable : false})
     name : string;
 
     @Column({type:'varchar' , nullable : true , length : 20 })

@@ -22,7 +22,7 @@ export class BatchService {
 
   async create(createBatchDto: CreateBatchDto) {
     
-    let level = await this.levelService.findOne(createBatchDto.level_id);
+    let level = await this.levelService.findOneForUpdate(createBatchDto.level_id);
     let batch;
 
     try { 

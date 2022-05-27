@@ -89,7 +89,7 @@ export class SpecialityService {
       }
 
 
-      if ( await this.specialityRepo.findOne({name : createSpecialityDto.name} )){
+      if ( await this.specialityRepo.findOne({name : createSpecialityDto.name , level : level} )){
         throw new HttpException(My_Helper.FAILED_RESPONSE('speciality name Exist') , 201) ;
       }
         let speciality;

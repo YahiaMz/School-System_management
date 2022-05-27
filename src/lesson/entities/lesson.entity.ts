@@ -10,7 +10,7 @@ import { Check, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, Primary
 @Check(`"day" > 0 and "day < 6"`)
 @Check(`"lesson_Type" = "TD" or "lesson_Type" = "TP" or "lesson_Type" = "COURS"`)
 @Check(`startingTime < endingTime`)
-@Unique(["day" , "teacher" , "startingTime" , "module"])
+@Unique(["startingTime", "day" , "teacher"  , "module"])
 @Unique(["day" , "sale" , "group" , "startingTime"])
 
 

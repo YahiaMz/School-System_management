@@ -55,7 +55,9 @@ try {
   return newLesson;
   } catch (error) {
     console.log(error.message);
-  throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong ! , { '+error.message+' }') , 201);
+    let errMessage =  "oops something wrong !"
+  
+    throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong ! , { '+error.message+' }') , 201);
 }
 
   }
@@ -199,7 +201,8 @@ async update(id: number, updateLessonDto: UpdateLessonDto) {
   async teacherTimeTable(teacher_Id : number) {
     let teacher = await this.teacherService.findTeacherByIdOrThrowExp(teacher_Id);
  try {
-     let teacherLessons = await this.lessonRepository.query(`SELECT * FROM lesson where lesson.teacher_Id =${teacher_Id}`);
+     let teacherLessons = await this.lessonRepository.query(`SELECT * FROM lesson where lesson.teacher_Id = ${teacher_Id}`);
+     
      for ( let x = 0 ; x < teacherLessons.length ; x ++) { 
         let sale = await this.saleService.findSaleByIdOrThrowExp(teacherLessons[x].sale_Id);
         delete teacherLessons[x].sale_Id;
@@ -224,6 +227,34 @@ async update(id: number, updateLessonDto: UpdateLessonDto) {
  } catch (error) {
      throw new HttpException(My_Helper.FAILED_RESPONSE(' something wrong ') , 201);
  }
+
+}
+
+
+async teacherSchedule(teacher_Id : number) {
+  let teacher = await this.teacherService.findTeacherByIdOrThrowExp(teacher_Id);
+try {
+   let teacherLessons = await this.lessonRepository.find({select : [ 'id','day' ,'startingTime', 'endingTime' , 'lesson_Type' ,] ,where : {teacher : teacher} , relations : ['teacher', "module",'group', "sale" ]} );
+   
+   let sunday = teacherLessons.filter(({day}) => day == 1);
+   let monday = teacherLessons.filter(({day}) => day == 2);
+   let tuesday = teacherLessons.filter(({day}) => day == 3);
+   let wednesday = teacherLessons.filter(({day}) => day == 4);
+   let thursday = teacherLessons.filter(({day}) => day == 5);
+
+
+    
+    return {
+      'sunday' : sunday , 
+      "monday" : monday , 
+      "tuesday" : tuesday , 
+      "wednesday" : wednesday , 
+      "thursday" : thursday
+    };
+
+} catch (error) {
+   throw new HttpException(My_Helper.FAILED_RESPONSE(' something wrong ' + error.message) , 201);
+}
 
 }
 

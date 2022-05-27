@@ -66,14 +66,15 @@ async findSpeciality_In_Batch( batch_Id : number , spec_Id : number ){
     console.log(createSectionDto);
     
     let batch = await this.batchService.findBatchByIdOrThrow_Exp(createSectionDto.batch_Id);
-
+    let speciality = null;
     if ( createSectionDto.speciality_Id ) { 
+       speciality =  await this.findSpecialityByIdOrThrowExp(createSectionDto.speciality_Id);
         let specialityInBatch = await this.findSpeciality_In_Batch(createSectionDto.batch_Id , createSectionDto.speciality_Id);
-    }
+       }
   let section;
  try {
-  section = this.sectionRepo.create({name : createSectionDto.name , batch_Id : createSectionDto.batch_Id , 
-   speciality_Id : createSectionDto.speciality_Id ? createSectionDto.speciality_Id : null
+  section = this.sectionRepo.create({name : createSectionDto.name , batch  : batch , 
+   speciality : speciality  ? speciality : null
   });
 
     await this.sectionRepo.save(section);
@@ -209,11 +210,11 @@ return section;
  }
 
 
-  public async doesThisSectionExistInThisSpeciality ( section_Id , spec_Id){
+  public async doesThisSectionExistInThisSpeciality ( section_Id , speciality){
    try {
      let result = await this.sectionRepo.find({
        id : section_Id , 
-       speciality_Id : spec_Id
+       speciality : speciality
      })
 
      if ( result.length > 0 ) {
@@ -228,11 +229,11 @@ return section;
   }
 
 
-  public async doesThisSectionExistInThisBatch ( section_Id , batch_Id){
+  public async doesThisSectionExistInThisBatch ( section_Id , batch){
     try {
       let result = await this.sectionRepo.find({
         id : section_Id , 
-        batch_Id : batch_Id
+        batch : batch
       })
  
       if ( result.length > 0 ) {

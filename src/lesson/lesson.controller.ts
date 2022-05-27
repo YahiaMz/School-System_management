@@ -48,7 +48,7 @@ export class LessonController {
 
   @Get('/ofTeacher/:id')
   async TeacherLessons(@Param('id') id: string) {
-    let lessons =  await this.lessonService.teacherTimeTable(+id);
+    let lessons =  await this.lessonService.teacherSchedule(+id);
     return My_Helper.SUCCESS_RESPONSE(lessons);
   }
 

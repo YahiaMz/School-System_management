@@ -50,11 +50,11 @@ export class StudentService {
    }
       let section = await this.sectionService.findSectionByIdOrThrowException(createStudentDto.section_Id);
       if(speciality) { 
-         if (!this.sectionService.doesThisSectionExistInThisSpeciality(createStudentDto.section_Id , createStudentDto.speciality_Id)){
+         if (!this.sectionService.doesThisSectionExistInThisSpeciality(createStudentDto.section_Id , speciality)){
             throw new HttpException(My_Helper.FAILED_RESPONSE('this section does not exist in this speciality') , 200);
          }
       } else { 
-         let batchHasSection = await this.sectionService.doesThisSectionExistInThisBatch(createStudentDto.section_Id , createStudentDto.batch_Id);
+         let batchHasSection = await this.sectionService.doesThisSectionExistInThisBatch(createStudentDto.section_Id , batch);
          if(!batchHasSection) { 
             throw new HttpException(My_Helper.FAILED_RESPONSE('this section does not exist in this batch') , 200); 
          }
