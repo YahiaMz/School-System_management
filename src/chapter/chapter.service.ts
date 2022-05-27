@@ -24,49 +24,21 @@ async  create(
    lecture_file : Express.Multer.File ,
     td_file : Express.Multer.File , td_correction_file : Express.Multer.File) {
 
+
+
+    let td_file_Name = null;
+    if(td_file) {
+      td_file_Name = 'td_File_'+createChapterDto.name+'_'+ uuidv4()+ My_Helper.fileExtinction(td_file.mimetype)
+    }
+    let td_correction_file_name = null;
+    if(td_correction_file) {   
+      td_correction_file_name =  'td_Correction_'+createChapterDto.name+'_'+ uuidv4()+ My_Helper.fileExtinction(td_correction_file.mimetype);
+    }
   
+
+
+    let mModuleAndItBatch = await  this.moduleService.findModuleAndHisBatchWiByIdOrThrow_Exp(createChapterDto.module_Id);
   
-   if ( !lecture_file || !My_Helper.is_Lecture(lecture_file.mimetype) ) {
-          throw new HttpException( 
-            My_Helper.FAILED_RESPONSE('lecture File must be not null and of type {.pdf , .ppt }')
-            , 201
-            );
-   }
-
-   let td_file_Name = null;
- 
-   if (td_file ) { 
-        if(!My_Helper.is_Lecture(td_file.mimetype)) {
-          throw new HttpException(My_Helper.FAILED_RESPONSE("TD file must be of type {.pdf , .ppt}") , 200)
-        } 
-      td_file_Name =  'td_'+createChapterDto.name+'_'+ uuidv4()+My_Helper.fileExtinction(td_file.mimetype);
-      }
-
-       
-      let td_correction_file_name = null;
-   if (td_correction_file ) { 
-    if(!My_Helper.is_Lecture(td_correction_file.mimetype)) {
-      throw new HttpException(My_Helper.FAILED_RESPONSE("Td correction file must be of type {.pdf , .ppt}") , 200)
-    } 
-    td_correction_file_name =  'td_Correction_'+createChapterDto.name+'_'+ uuidv4()+ My_Helper.fileExtinction(td_file.mimetype);
-  }
-
-
-    let mModule = await  this.moduleService.findModuleByIdOrThrow_Exp(createChapterDto.module_Id);
-    let batch  = await  this.batchService.findBatchByIdOrThrow_Exp(createChapterDto.batch_Id);
-    
-    
-
-
-
-
-    delete batch.specialities;
-    delete batch.created_at;
-    delete batch.updated_at;
-
-    delete mModule.created_at;
-    delete mModule.updated_at;
-
     // creating new Chapter 
     try {
       
@@ -75,8 +47,8 @@ async  create(
         description : createChapterDto.description
       });
 
-      chapter.batch = batch;
-      chapter.module = mModule;
+      chapter.batch = mModuleAndItBatch.itBatch;
+      chapter.module = mModuleAndItBatch.module;
 
       let mLecture_fileName = 'Cours_'+createChapterDto.name+'_'+ uuidv4()  + My_Helper.fileExtinction(lecture_file.mimetype);
       let mPath = My_Helper.chaptersFilesPath + mLecture_fileName;
@@ -108,7 +80,7 @@ async  create(
       
       throw new HttpException( 
        { success : false , 
-      message : 'something wrong' , 
+      message : 'something wrong' + error.message , 
       error_message : error.message
     } ,
         201);  
@@ -138,8 +110,57 @@ async  create(
     return `This action returns a #${id} chapter`;
   }
 
-  update(id: number, updateChapterDto: UpdateChapterDto) {
-    return `This action updates a #${id} chapter`;
+
+  // updating chapter number one ....
+  async update(id: number, updateChapterDto: UpdateChapterDto , uLectureFile : Express.Multer.File , uTdFile : Express.Multer.File , uTdCorrectionFile : Express.Multer.File) {
+   let chapter = await this.findChapterByIdOrThrowExp(id);
+   if(uLectureFile) {
+     let mPath = My_Helper.chaptersFilesPath +  chapter.lecture_file;
+    const writeStreamForChapter = createWriteStream(mPath);
+    writeStreamForChapter.write(uLectureFile.buffer)
+   }
+
+   if(uTdFile){
+     let uTdFileName = null;
+     if (chapter.td_file) {
+       uTdFileName = chapter.td_file;
+     } else {
+       uTdFileName = 'td_File_'+chapter.name+'_'+ uuidv4()+ My_Helper.fileExtinction(uTdFile.mimetype)
+     };
+
+     let mTdPath = My_Helper.chaptersFilesPath +  uTdFileName;
+     const writeStreamForChapter = createWriteStream(mTdPath);
+     writeStreamForChapter.write(uLectureFile.buffer)
+    chapter.td_file = uTdFileName;
+   }
+
+
+   if(uTdCorrectionFile){
+    let uTdCorrectionFileName = null;
+    if (chapter.td_file) {
+      uTdCorrectionFileName = chapter.td_correction_file;
+    } else {
+      uTdCorrectionFileName = 'td_Correction_File_'+chapter.name+'_'+ uuidv4()+ My_Helper.fileExtinction(uTdCorrectionFile.mimetype)
+    };
+
+    let mTdCorrectionPath = My_Helper.chaptersFilesPath +  uTdCorrectionFileName;
+    const writeStreamForChapter = createWriteStream(mTdCorrectionPath);
+    writeStreamForChapter.write(uLectureFile.buffer)
+    chapter.td_correction_file = uTdCorrectionFileName;
+  }
+
+  Object.assign(chapter , updateChapterDto);
+
+  try {
+  
+    let uChapter = await this.chapterRepository.save(chapter);
+   return uChapter;
+  } catch (error) {
+    throw new HttpException( My_Helper.FAILED_RESPONSE('Chapter NAME EXIST') , 201);
+
+  }
+
+
   }
 
 private async findChapterByIdOrThrowExp ( id : number) {
@@ -160,9 +181,19 @@ private async findChapterByIdOrThrowExp ( id : number) {
  async  remove(id: number) {
  let chapterToRemove = await this.findChapterByIdOrThrowExp(id);
     try {
-      fs.unlinkSync(My_Helper.chaptersFilesPath+chapterToRemove.lecture_file); 
+      await fs.unlinkSync(My_Helper.chaptersFilesPath+chapterToRemove.lecture_file); 
+      if(chapterToRemove.td_file) {
+       await fs.unlinkSync(My_Helper.chaptersFilesPath+chapterToRemove.td_file); 
+      } 
+      if(chapterToRemove.td_correction_file) {
+        await fs.unlinkSync(My_Helper.chaptersFilesPath+chapterToRemove.td_correction_file); 
+      }
       await this.chapterRepository.remove(chapterToRemove);
     } catch (error) {
+
+      await this.chapterRepository.remove(chapterToRemove);
+
+
       throw new HttpException( { 
         success : false , 
         message : "something wrong" , 
@@ -180,6 +211,20 @@ private async findChapterByIdOrThrowExp ( id : number) {
       throw new HttpException(My_Helper.FAILED_RESPONSE('file not found') , 201);
     }
    }
+
+
+
+   async findAllChaptersOfModule( module_Id : number  ){
+     
+    let mModule = await this.moduleService.findModuleAndHisBatchWiByIdOrThrow_Exp(module_Id);
+    
+    try {
+      return await this.chapterRepository.find({module : mModule.module , batch : mModule.itBatch});
+    } catch (error) {
+      throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong !' + error.message) , 201);
+    }
+
+   } 
 
 
 }

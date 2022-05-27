@@ -37,7 +37,7 @@ const localhost = {
 host: 'localhost',
 port: 3306,
 username : 'Yahia',
-password : '12345;',
+password : 'AzerbB14916;',
 database: '1cs-project-db'
 };
 
@@ -56,11 +56,11 @@ const railwayDb = {
 @Module({
 imports: [TypeOrmModule.forRoot({
   type: 'mysql',
-    host: 'containers-us-west-60.railway.app',
-    port: 6755,
-    username : 'root',
-    password : '8WSDwuy5QXXpIIImksm0',
-    database: 'railway',
+  host: 'containers-us-west-60.railway.app',
+  port: 6755,
+  username : 'root',
+  password : '8WSDwuy5QXXpIIImksm0',
+  database: 'railway',
     entities: [
       Teacher , Admin , ModuleEntity , 
       Student  , Batch , Level , Speciality , 

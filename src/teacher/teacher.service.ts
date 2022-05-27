@@ -238,15 +238,17 @@ export class TeacherService {
  
          try {
          
-         let modules = await this.teacherRepository.query(`SELECT  m.* from teacher t  inner join lesson l on
+         let modules = await this.teacherRepository.query(`SELECT distinct m.* , l.lesson_Type = 'COURS' as 'isTheLecturer' from teacher t  inner join lesson l on
           l.teacher_Id = t.id  INNER JOIN module m 
-         on l.module_Id  = m.id where l.teacher_Id = ${teacher_Id} GROUP BY m.id ;`)
+         on l.module_Id  = m.id where l.teacher_Id = ${teacher_Id} ;`)
 
             return modules;
          }
     
           catch (error) {
-             
+            
+            throw new HttpException(My_Helper.FAILED_RESPONSE(' something wrong ' + error.message) , 201);
+            
          }
     }
 

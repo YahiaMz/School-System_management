@@ -125,8 +125,6 @@ public async findBatchByIdOrThrow_Exp( id : number) {
   async update(id: number, attrs : UpdateBatchDto) {
         console.log(attrs);
 
-   
-     
     let batchForUpdate = await this.findBatchByIdOrThrow_Exp(id);
      if(attrs.level_id) {
     let newLevel = await this.levelService.findOneForUpdate(attrs.level_id);

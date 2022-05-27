@@ -3,16 +3,16 @@ import { Module } from "src/module/module.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 
 @Entity({name : 'chapters'})
-@Unique(['name','batch' , 'module'])
+@Unique(['name','batch','module'])
 export class Chapter {
     
     @PrimaryGeneratedColumn()
     id : number;
 
-    @Column({type : 'varchar' , length : '40'})
+    @Column({type : 'varchar' , length : 100})
     name : string;
 
-    @Column({type : 'varchar' , length : '500' , nullable : true})
+    @Column({type : 'varchar' , length : 800 , nullable : true})
     description : string;
 
     @Column({type : 'varchar' , nullable : false})

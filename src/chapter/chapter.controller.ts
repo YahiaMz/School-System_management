@@ -18,11 +18,33 @@ export class ChapterController {
                                         ]))
 
   async create(@Body() createChapterDto: CreateChapterDto , 
-                @UploadedFiles() files : {lecture_file : Express.Multer.File , td_file : Express.Multer.File , td_correction_file : Express.Multer.File}  
+                @UploadedFiles() files : {lecture_file : Express.Multer.File[] , td_file? : Express.Multer.File[] , td_correction_file? : Express.Multer.File[]}  
               ) {
-                                
-    let chapter = await this.chapterService.create(createChapterDto , files['lecture_file'][0] , files['td_file'][0] , files['td_correction_file'][0] );
-    return My_Helper.SUCCESS_RESPONSE(chapter);
+
+                if ( !files.lecture_file || files.lecture_file.length == 0 || !My_Helper.is_Lecture(files.lecture_file[0].mimetype) ) {
+                  return My_Helper.FAILED_RESPONSE('lecture File must be not null and of type {.pdf , .ppt }')
+               }
+
+               let mLectureFile = files.lecture_file[0];
+              
+               if ( files.td_file && files.td_file.length > 0 && !My_Helper.is_Lecture(files.td_file[0].mimetype)){
+                return My_Helper.FAILED_RESPONSE('td File must be of type {.pdf , .ppt }');
+               }
+              let mTdFile = ( files.td_file && files.td_file.length > 0 ) ?  files.td_file[0] : null ;
+
+              
+               if ( files.td_correction_file && files.td_correction_file.length > 0 && !My_Helper.is_Lecture(files.td_correction_file[0].mimetype)){
+                return My_Helper.FAILED_RESPONSE('td correction must be of type {.pdf , .ppt }');
+               }
+
+
+              let mTdCorrectionFile = ( files.td_correction_file && files.td_correction_file.length > 0 ) ?  files.td_correction_file[0] : null ;
+
+
+
+
+                    let chapter = await this.chapterService.create(createChapterDto ,mLectureFile , mTdFile , mTdCorrectionFile );
+                 return My_Helper.SUCCESS_RESPONSE(chapter);
  
   }
 
@@ -37,10 +59,40 @@ export class ChapterController {
     return this.chapterService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateChapterDto: UpdateChapterDto) {
-    return this.chapterService.update(+id, updateChapterDto);
-  }
+  @Patch('/update/:id')
+  @UseInterceptors( FileFieldsInterceptor([
+    {name : 'lecture_file' , maxCount : 1}  ,
+    {name : 'td_file' , maxCount : 1} , 
+    {name:"td_correction_file" , maxCount : 1}
+   ]))
+
+  async update(@Param('id') id: string, @Body() updateChapterDto: UpdateChapterDto ,  @UploadedFiles() files : {lecture_file? : Express.Multer.File[] , td_file? : Express.Multer.File[] , td_correction_file? : Express.Multer.File[]}) {
+    
+    if ( files.lecture_file && files.lecture_file.length > 0 && !My_Helper.is_Lecture(files.lecture_file[0].mimetype) ) {
+      return My_Helper.FAILED_RESPONSE('lecture File must of type {.pdf , .ppt }')
+    }
+   let uLectureFile = (files.lecture_file && files.lecture_file.length > 0) ? files.lecture_file[0] : null;
+   
+   if ( files.td_file && files.td_file.length > 0 && !My_Helper.is_Lecture(files.td_file[0].mimetype)){
+    return My_Helper.FAILED_RESPONSE('td File must be of type {.pdf , .ppt }');
+   }
+  let uTdFile = ( files.td_file && files.td_file.length > 0 ) ?  files.td_file[0] : null ;
+   
+  if ( files.td_correction_file && files.td_correction_file.length > 0 && !My_Helper.is_Lecture(files.td_correction_file[0].mimetype)){
+    return My_Helper.FAILED_RESPONSE('td correction must be of type {.pdf , .ppt }');
+   }
+  let uTdCorrectionFile = ( files.td_correction_file && files.td_correction_file.length > 0 ) ?  files.td_correction_file[0] : null ;
+
+
+
+  if( uLectureFile || uTdFile || uTdCorrectionFile || Object.keys(updateChapterDto).length > 0 ){
+    let updatedChapter = await this.chapterService.update(+id, updateChapterDto , uLectureFile , uTdFile , uTdCorrectionFile);
+    return My_Helper.SUCCESS_RESPONSE(updatedChapter); 
+  } else {
+     return My_Helper.SUCCESS_RESPONSE("no thing to update")
+   }
+
+   }
 
   @Delete('/delete/:id')
   async remove(@Param('id') id: string) {
@@ -53,6 +105,15 @@ export class ChapterController {
   async getLectureFile (@Param('lecture_name') lecture_name : string , @Res() res) {
      return this.chapterService.sendLecturesFiles(lecture_name , res );
    }
+
+
+   @Get('/OfModule/:module_Id')
+   async getChapterOfModule (@Param('module_Id') module_Id : string ) {
+     console.log(module_Id);
+     
+      return  await this.chapterService.findAllChaptersOfModule(+module_Id);
+    }
+ 
 
 
 

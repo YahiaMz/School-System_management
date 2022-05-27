@@ -42,7 +42,6 @@ export class Module {
     @ManyToOne(type => Speciality , {nullable : true , onDelete : 'CASCADE' , onUpdate : 'CASCADE'} )
     @JoinColumn({name : 'speciality_Id' })
     speciality : Speciality;
-
     
     
 

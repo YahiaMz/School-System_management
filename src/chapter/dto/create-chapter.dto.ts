@@ -10,9 +10,6 @@ export class CreateChapterDto {
     description : string;
 
     @IsNumberString()
-    batch_Id : number;
-
-    @IsNumberString()
     module_Id : number;
 
     

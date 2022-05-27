@@ -39,6 +39,37 @@ constructor( @InjectRepository(Module) private moduleRepository : Repository<Mod
      )
  }
 
+
+
+
+ private async findLevelAndItCurrentBatchByIdOrThrowExp ( level_Id ) { 
+    let level;
+    try {
+        level = await this.levelRepo.findOne({id : level_Id} , {relations :['currentBatch']});
+    
+        if ( level && level.currentBatch ) return level;
+    } catch (error) {
+        throw new HttpException ( 
+            My_Helper.FAILED_RESPONSE('something wrong ') , 
+            201);
+    }
+
+    if(!level)
+     throw new HttpException( 
+         My_Helper.FAILED_RESPONSE('level not found') , 
+         201
+    );
+    
+    
+    throw new HttpException( 
+        My_Helper.FAILED_RESPONSE('there is no batch in this level') , 
+        201
+   );
+ 
+    }
+
+
+
     async createModule ( moduleInfo : CreateModuleDto , image : Express.Multer.File  ){
          
       console.log(moduleInfo);
@@ -223,6 +254,31 @@ constructor( @InjectRepository(Module) private moduleRepository : Repository<Mod
 
         throw new HttpException(My_Helper.FAILED_RESPONSE('module not found') , 201);
     }
+
+  
+    public async findModuleAndHisBatchWiByIdOrThrow_Exp ( id : number ){ 
+        try {
+            let mModule = await this.moduleRepository.findOne({id : id} , {loadRelationIds : true});
+            let currentBatchOfThisModule = await this.findLevelAndItCurrentBatchByIdOrThrowExp(mModule.level);
+            
+            if( mModule ){ 
+                
+                return {
+                    'module' : mModule ,
+                    'itBatch' : currentBatchOfThisModule.currentBatch 
+                } }
+
+
+        } catch (error) {
+            throw new HttpException(
+                 My_Helper.FAILED_RESPONSE(' something wrong !' + error.message)  ,
+             201);
+        }
+
+        throw new HttpException(My_Helper.FAILED_RESPONSE('module not found') , 201);
+    }
+
+  
 
     async updateImage ( id : number , image : Express.Multer.File) {
         
