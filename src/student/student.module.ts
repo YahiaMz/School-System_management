@@ -12,6 +12,7 @@ import { SpecialityModule } from 'src/speciality/speciality.module';
 @Module({
   providers: [StudentService],
   controllers: [StudentController] , 
-  imports : [TypeOrmModule.forFeature([Student]) , GroupModule , SectionModule , BatchModule , SpecialityModule  ]
+  imports : [TypeOrmModule.forFeature([Student]) , GroupModule , SectionModule , BatchModule , SpecialityModule  ] , 
+  exports : [StudentService]
 })
 export class StudentModule {}

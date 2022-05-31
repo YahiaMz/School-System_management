@@ -17,7 +17,10 @@ export class SaleService {
        let sale = this.saleRepository.create({ 
         name : createSaleDto.name,
         capacity : createSaleDto.capacity ,
-        hasDataShow : createSaleDto.hasDataShow
+        hasDataShow : createSaleDto.hasDataShow , 
+        hasNetworkEquipment :createSaleDto.hasNetworkEquipment ,
+        roomType : createSaleDto.roomType , 
+        area : createSaleDto.area
       });
 
       let newSale  = await this.saleRepository.save(sale);
@@ -37,6 +40,33 @@ export class SaleService {
    }
 
   }
+
+
+  async findAllStudyRoomOfType( roomType : string ) {
+    try {
+      let sales = await this.saleRepository.find({where : {
+        roomType : roomType
+      }});
+      return sales;
+    } catch (error) {
+     throw new HttpException( My_Helper.FAILED_RESPONSE('something wrong') , 201)
+    }
+ 
+   }
+
+
+
+  async findAllStudyRoomInArea( roomArea : string ) {
+    try {
+      let sales = await this.saleRepository.find({where : {
+        area : roomArea
+      }});
+      return sales;
+    } catch (error) {
+     throw new HttpException( My_Helper.FAILED_RESPONSE('something wrong') , 201)
+    }
+ 
+   }
 
 
   public async findSaleByIdOrThrowExp ( id :number) {
@@ -78,8 +108,7 @@ export class SaleService {
   async getAvailableSales ( day : number ,time : string ) { 
 
     console.log(time);
-    
-  
+
     try {
    
       let availableSales = await this.saleRepository.query(`

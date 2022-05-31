@@ -133,6 +133,37 @@ export class StudentService {
     }
 
 
+    async findStudentByIdOrThrowException ( idStudent : number ) {
+
+      if (isNaN(idStudent)) {
+        throw (( new HttpException({ 
+          success : false , 
+          message : 'Id must be an integer !'
+      } , 201)));
+      }
+
+      let student;
+      try { 
+         student = await this.studentRep.findOne({ id : idStudent });
+      }catch (e) {
+           throw ( new HttpException( { success : false , 
+          statusCode : 201 , 
+          message : 'Something wrong !'
+      } , 201))
+       }
+
+
+       if (!student)  throw (( new HttpException({ 
+        success : false , 
+        message : 'Student not found '
+    } , 201)));
+
+       return student;
+
+  }
+
+
+
 async studentLogin( loginStudentDto : LoginStudentDto ) { 
 
     let student;

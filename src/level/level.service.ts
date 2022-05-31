@@ -102,7 +102,6 @@ export class LevelService {
 }
 
 
-
   async findOneForUpdate(id: number) {
     let level; 
     try {

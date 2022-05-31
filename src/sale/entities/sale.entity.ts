@@ -14,6 +14,15 @@ export class Sale {
 
     @Column({type : "boolean", nullable : false , default : 0 })
     hasDataShow : boolean;
+    
+    @Column({type : "boolean", nullable : false , default : 0 })
+    hasNetworkEquipment: boolean;
+
+    @Column({type : 'varchar'  , length : '30' , nullable : false })
+    roomType  : string;
+
+    @Column({type : 'varchar'  , length : '30' , nullable : false})
+    area  : string;
 
     @CreateDateColumn()
     created_at: string;

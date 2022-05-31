@@ -10,16 +10,14 @@ export class LessonController {
 
   @Post('/create')
   async create(@Body() createLessonDto: CreateLessonDto) {
+        
     let newLesson = await this.lessonService.create(createLessonDto);
     return My_Helper.SUCCESS_RESPONSE(newLesson);
   }
 
   @Get('/allOfSection=:section_Id/inSemester=:semester')
   async findAll(@Param('section_Id') section_Id : string , @Param('semester') semester : string) {
-    
-
-    console.log(section_Id);
-    
+  
 
     if (section_Id && isNaN(+ section_Id ) ) { 
       return {
@@ -27,8 +25,6 @@ export class LessonController {
         message : 'section_Id must be an integer'
       }
     } 
-
-
     if (semester && isNaN( + semester ) ) { 
       return {
         success : false , 

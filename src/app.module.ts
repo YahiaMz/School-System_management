@@ -28,6 +28,10 @@ import { Teacher } from './teacher/teacher.entity';
 import { TeacherModule } from './teacher/teacher.module';
 import { Timetable } from './timetable/entities/timetable.entity';
 import {Module as ModuleEntity} from './module/module.entity';
+import { MarksModule } from './marks/marks.module';
+import { MessagesModule } from './messages/messages.module';
+import { Message } from './messages/entities/message.entity';
+
 
 
 
@@ -56,17 +60,17 @@ const railwayDb = {
 @Module({
 imports: [TypeOrmModule.forRoot({
   type: 'mysql',
-  host: 'containers-us-west-60.railway.app',
-  port: 6755,
-  username : 'root',
-  password : '8WSDwuy5QXXpIIImksm0',
-  database: 'railway',
+  host: 'localhost',
+  port: 3306,
+  username : 'Yahia',
+  password : 'AzerbB14916;',
+  database: '1cs-project-db',
     entities: [
       Teacher , Admin , ModuleEntity , 
       Student  , Batch , Level , Speciality , 
       Group  ,
       New , Chapter , Timetable ,
-       Lesson , Sale
+       Lesson , Sale , Message
     ],
     synchronize: true,
     autoLoadEntities : true 
@@ -82,7 +86,7 @@ imports: [TypeOrmModule.forRoot({
   NewModule,
   ChapterModule,
   SaleModule,  
-  LessonModule , 
+  LessonModule,MarksModule, MessagesModule , 
 
 ],
   controllers: [AppController],

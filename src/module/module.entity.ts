@@ -3,9 +3,7 @@ import { Speciality } from "src/speciality/entities/speciality.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
-export class Module { 
-
-
+export class Module {
 
     @PrimaryGeneratedColumn({type:'integer'})
     id : number;

@@ -72,7 +72,10 @@ let section = await this.sectionService.findSectionByIdOrThrowException(section_
        section : section ,
        day : 1 ,
        semester : semester
-     }, 
+     },  
+     order : {
+      startingTime : 'ASC'
+     } ,
      relations : ['teacher' , 'group' , 'sale' , 'module' ]
    })
   
@@ -84,6 +87,10 @@ let section = await this.sectionService.findSectionByIdOrThrowException(section_
       semester : semester
 
     }, 
+    order : {
+      startingTime : 'ASC'
+   } ,
+  
     relations : ['teacher' , 'group' , 'sale' , 'module' ]
   })
 
@@ -91,9 +98,13 @@ let section = await this.sectionService.findSectionByIdOrThrowException(section_
     where : {
       section : section ,
       day : 3 ,
-      semester : 1
+      semester : semester
 
     }, 
+    order : {
+      startingTime : 'ASC'
+   } ,
+  
     relations : ['teacher' , 'group' , 'sale' , 'module' ]
   })
 
@@ -104,6 +115,10 @@ let section = await this.sectionService.findSectionByIdOrThrowException(section_
       semester : semester
 
     }, 
+    order : {
+      startingTime : 'ASC'
+   } ,
+  
     relations : ['teacher' , 'group' , 'sale' , 'module' ]
   })
 
@@ -114,6 +129,10 @@ let section = await this.sectionService.findSectionByIdOrThrowException(section_
       day : 5 ,
       semester : semester
     }, 
+    order : {
+      startingTime : 'ASC'
+   } ,
+  
     relations : ['teacher' , 'group' , 'sale' , 'module' ]
   })
 
@@ -201,7 +220,7 @@ async update(id: number, updateLessonDto: UpdateLessonDto) {
   async teacherTimeTable(teacher_Id : number) {
     let teacher = await this.teacherService.findTeacherByIdOrThrowExp(teacher_Id);
  try {
-     let teacherLessons = await this.lessonRepository.query(`SELECT * FROM lesson where lesson.teacher_Id = ${teacher_Id}`);
+     let teacherLessons = await this.lessonRepository.query(`SELECT * FROM lesson where lesson.teacher_Id = ${teacher_Id} order by lesson.created_at `);
      
      for ( let x = 0 ; x < teacherLessons.length ; x ++) { 
         let sale = await this.saleService.findSaleByIdOrThrowExp(teacherLessons[x].sale_Id);
@@ -234,7 +253,7 @@ async update(id: number, updateLessonDto: UpdateLessonDto) {
 async teacherSchedule(teacher_Id : number) {
   let teacher = await this.teacherService.findTeacherByIdOrThrowExp(teacher_Id);
 try {
-   let teacherLessons = await this.lessonRepository.find({select : [ 'id','day' ,'startingTime','semester', 'endingTime' , 'lesson_Type' ,] ,where : {teacher : teacher} , relations : ['teacher', "module",'group', "sale" ]} );
+   let teacherLessons = await this.lessonRepository.find({select : [ 'id','day' ,'startingTime','semester', 'endingTime' , 'lesson_Type' ,] ,where : {teacher : teacher} , relations : ['teacher', "module",'group', "sale" ] , order : {startingTime:'ASC'}} );
    
    let sunday = teacherLessons.filter(({day}) => day == 1);
    let monday = teacherLessons.filter(({day}) => day == 2);
@@ -258,17 +277,6 @@ try {
 
 }
 
-
-async teacherGroups(teacher_Id : number) {
-  let teacher = await this.teacherService.findTeacherByIdOrThrowExp(teacher_Id);
-try {
-   let teacherLessons = await this.lessonRepository.query("select distinct g.* ,s.name as 'inSection' , l.name as 'inLevel'  from lesson,`group` g ,`section` s, `level` l , batch b where g.id = lesson.group_Id and g.section_Id = s.id and s.batch_Id = b.id and b.level_Id = l.id  and lesson.teacher_Id ="+teacher.id );
-    return teacherLessons;
-} catch (error) {
-   throw new HttpException(My_Helper.FAILED_RESPONSE(' something wrong ' + error.message) , 201);
-}
-
-}
 
 
 
