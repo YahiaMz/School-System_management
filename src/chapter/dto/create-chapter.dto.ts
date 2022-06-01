@@ -9,9 +9,8 @@ export class CreateChapterDto {
     @IsOptional()
     description : string;
 
-    @IsNumberString()
+    @IsNumber()
     module_Id : number;
 
-    
 
 }

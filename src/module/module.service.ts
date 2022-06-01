@@ -42,19 +42,20 @@ constructor( @InjectRepository(Module) private moduleRepository : Repository<Mod
 
 
 
- private async findLevelAndItCurrentBatchByIdOrThrowExp ( level_Id ) { 
-    let level;
-    try {
-        level = await this.levelRepo.findOne({id : level_Id} , {relations :['currentBatch']});
+ private async findLevelAndItCurrentBatchByIdOrThrowExp ( level_Id : number) { 
     
-        if ( level && level.currentBatch ) return level;
+    let mLevel;    
+    try {
+        mLevel = await this.levelRepo.findOne({id : level_Id} , {relations :['currentBatch']});
+        if ( mLevel!=null && mLevel.currentBatch!=null ) 
+        return mLevel;
     } catch (error) {
         throw new HttpException ( 
             My_Helper.FAILED_RESPONSE('something wrong ') , 
             201);
     }
 
-    if(!level)
+    if(!mLevel)
      throw new HttpException( 
          My_Helper.FAILED_RESPONSE('level not found') , 
          201
@@ -243,7 +244,7 @@ constructor( @InjectRepository(Module) private moduleRepository : Repository<Mod
         // remember you're using it in Chapter Service 
    public async findModuleByIdOrThrow_Exp ( id : number ){ 
         try {
-            let mModule = await this.moduleRepository.findOne({id : id});
+            let mModule = await this.moduleRepository.findOne({id : id} , {loadRelationIds : true});
             if( mModule ) return mModule;
 
         } catch (error) {
@@ -257,10 +258,14 @@ constructor( @InjectRepository(Module) private moduleRepository : Repository<Mod
 
   
     public async findModuleAndHisBatchWiByIdOrThrow_Exp ( id : number ){ 
-        try {
-            let mModule = await this.moduleRepository.findOne({id : id} , {loadRelationIds : true});
-            let currentBatchOfThisModule = await this.findLevelAndItCurrentBatchByIdOrThrowExp(mModule.level);
+              
+        
+        let mModule = await this.findModuleByIdOrThrow_Exp(id);
             
+
+        let currentBatchOfThisModule = await this.findLevelAndItCurrentBatchByIdOrThrowExp(+mModule.level);
+        try {
+
             if( mModule ){ 
                 
                 return {
@@ -271,7 +276,7 @@ constructor( @InjectRepository(Module) private moduleRepository : Repository<Mod
 
         } catch (error) {
             throw new HttpException(
-                 My_Helper.FAILED_RESPONSE(' something wrong !' + error.message)  ,
+                 My_Helper.FAILED_RESPONSE(' something wrong ! -> ' + error.message)  ,
              201);
         }
 

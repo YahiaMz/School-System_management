@@ -1,4 +1,4 @@
-import { Admin } from "src/admin/admin.entity";
+import { Admin } from "src/admin/entities/admin.entity";
 import { Batch } from "src/batch/entities/batch.entity";
 import { Group } from "src/group/entities/group.entity";
 import { Student } from "src/student/student.entity";

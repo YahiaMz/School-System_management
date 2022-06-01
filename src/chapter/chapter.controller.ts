@@ -11,82 +11,46 @@ export class ChapterController {
   constructor(private readonly chapterService: ChapterService) {}
 
   @Post('/create')
-@UseInterceptors( FileFieldsInterceptor([
-                                         {name : 'lecture_file' , maxCount : 1}  ,
-                                         {name : 'td_file' , maxCount : 1} , 
-                                         {name:"td_correction_file" , maxCount : 1}
-                                        ]))
 
   async create(@Body() createChapterDto: CreateChapterDto , 
                 @UploadedFiles() files : {lecture_file : Express.Multer.File[] , td_file? : Express.Multer.File[] , td_correction_file? : Express.Multer.File[]}  
               ) {
 
-                if ( !files.lecture_file || files.lecture_file.length == 0 || !My_Helper.is_Lecture(files.lecture_file[0].mimetype) ) {
-                  return My_Helper.FAILED_RESPONSE('lecture File must be not null and of type {.pdf , .ppt }')
-               }
-
-               let mLectureFile = files.lecture_file[0];
-              
-               if ( files.td_file && files.td_file.length > 0 && !My_Helper.is_Lecture(files.td_file[0].mimetype)){
-                return My_Helper.FAILED_RESPONSE('td File must be of type {.pdf , .ppt }');
-               }
-              let mTdFile = ( files.td_file && files.td_file.length > 0 ) ?  files.td_file[0] : null ;
-
-              
-               if ( files.td_correction_file && files.td_correction_file.length > 0 && !My_Helper.is_Lecture(files.td_correction_file[0].mimetype)){
-                return My_Helper.FAILED_RESPONSE('td correction must be of type {.pdf , .ppt }');
-               }
-
-
-              let mTdCorrectionFile = ( files.td_correction_file && files.td_correction_file.length > 0 ) ?  files.td_correction_file[0] : null ;
+            
+              //  if ( files.td_correction_file && files.td_correction_file.length > 0 && !My_Helper.is_Lecture(files.td_correction_file[0].mimetype)){
+              //   return My_Helper.FAILED_RESPONSE('td correction must be of type {.pdf , .ppt }');
+              //  }
 
 
 
 
-                    let chapter = await this.chapterService.create(createChapterDto ,mLectureFile , mTdFile , mTdCorrectionFile );
+
+
+                    let chapter = await this.chapterService.create(createChapterDto  );
                  return My_Helper.SUCCESS_RESPONSE(chapter);
  
   }
 
-  @Get('/all')
-  async findAll(@Body() getChaptersDto : GetChaptersDto) {
-    let chapters = await this.chapterService.findChaptersOfModule(getChaptersDto.module_Id , getChaptersDto.batch_Id);
+  @Get('/of-module=:module_Id/in-batch=:batch_Id')
+  async findAll(@Param('module_Id') moduleId , @Param('batch_Id') batchId) {
+     if ( isNaN(moduleId) ) {
+       return My_Helper.FAILED_RESPONSE('module id must be integer')
+     }
+
+     if ( isNaN(batchId) ) {
+      return My_Helper.FAILED_RESPONSE('batch id must be integer')
+    }
+
+    let chapters = await this.chapterService.findChaptersOfModuleInBatch(+moduleId , +batchId );
     return My_Helper.SUCCESS_RESPONSE(chapters);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.chapterService.findOne(+id);
-  }
-
   @Patch('/update/:id')
-  @UseInterceptors( FileFieldsInterceptor([
-    {name : 'lecture_file' , maxCount : 1}  ,
-    {name : 'td_file' , maxCount : 1} , 
-    {name:"td_correction_file" , maxCount : 1}
-   ]))
-
-  async update(@Param('id') id: string, @Body() updateChapterDto: UpdateChapterDto ,  @UploadedFiles() files : {lecture_file? : Express.Multer.File[] , td_file? : Express.Multer.File[] , td_correction_file? : Express.Multer.File[]}) {
-    
-    if ( files.lecture_file && files.lecture_file.length > 0 && !My_Helper.is_Lecture(files.lecture_file[0].mimetype) ) {
-      return My_Helper.FAILED_RESPONSE('lecture File must of type {.pdf , .ppt }')
-    }
-   let uLectureFile = (files.lecture_file && files.lecture_file.length > 0) ? files.lecture_file[0] : null;
+  async update(@Param('id') id: string, @Body() updateChapterDto: UpdateChapterDto ,  ) {
    
-   if ( files.td_file && files.td_file.length > 0 && !My_Helper.is_Lecture(files.td_file[0].mimetype)){
-    return My_Helper.FAILED_RESPONSE('td File must be of type {.pdf , .ppt }');
-   }
-  let uTdFile = ( files.td_file && files.td_file.length > 0 ) ?  files.td_file[0] : null ;
-   
-  if ( files.td_correction_file && files.td_correction_file.length > 0 && !My_Helper.is_Lecture(files.td_correction_file[0].mimetype)){
-    return My_Helper.FAILED_RESPONSE('td correction must be of type {.pdf , .ppt }');
-   }
-  let uTdCorrectionFile = ( files.td_correction_file && files.td_correction_file.length > 0 ) ?  files.td_correction_file[0] : null ;
 
-
-
-  if( uLectureFile || uTdFile || uTdCorrectionFile || Object.keys(updateChapterDto).length > 0 ){
-    let updatedChapter = await this.chapterService.update(+id, updateChapterDto , uLectureFile , uTdFile , uTdCorrectionFile);
+  if( Object.keys(updateChapterDto).length > 0 ){
+    let updatedChapter = await this.chapterService.update(+id, updateChapterDto );
     return My_Helper.SUCCESS_RESPONSE(updatedChapter); 
   } else {
      return My_Helper.SUCCESS_RESPONSE("no thing to update")
@@ -101,17 +65,12 @@ export class ChapterController {
   }
 
 
-  @Get('/files/:lecture_name')
-  async getLectureFile (@Param('lecture_name') lecture_name : string , @Res() res) {
-     return this.chapterService.sendLecturesFiles(lecture_name , res );
-   }
-
-
-   @Get('/OfModule/:module_Id')
+   @Get('/of-module=:module_Id/InCurrentBatch')
    async getChapterOfModule (@Param('module_Id') module_Id : string ) {
-     console.log(module_Id);
-     
-      return  await this.chapterService.findAllChaptersOfModule(+module_Id);
+    if ( isNaN(+module_Id) ) {
+      return My_Helper.FAILED_RESPONSE('module id must be integer')
+    }      
+    return My_Helper.SUCCESS_RESPONSE( await this.chapterService.findAllChaptersOfModuleInCurrentBatch(+module_Id));
     }
  
 

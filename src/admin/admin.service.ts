@@ -1,7 +1,7 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Admin } from './admin.entity';
+import { Admin } from './entities/admin.entity';
 import { LoginAdminDto } from './dtos/login-admin.dto';
 import * as bcrypt from 'bcrypt';
 

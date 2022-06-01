@@ -9,6 +9,7 @@ import { GroupModule } from 'src/group/group.module';
 import { ModuleModule } from 'src/module/module.module';
 import { SectionService } from 'src/section/section.service';
 import { SectionModule } from 'src/section/section.module';
+import { CurrentSemesterModule } from 'src/current-semester/current-semester.module';
 
 @Module({
   controllers: [LessonController],
@@ -18,7 +19,8 @@ import { SectionModule } from 'src/section/section.module';
   TeacherModule , 
   GroupModule , 
   SectionModule ,
-  ModuleModule
+  ModuleModule , 
+  CurrentSemesterModule
 ]
 })
 export class LessonModule {}

@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateAdminDto } from 'src/admin/dtos/update-admin.dto';
+import { CurrentSemesterService } from 'src/current-semester/current-semester.service';
 import { GroupService } from 'src/group/group.service';
 import { ModuleService } from 'src/module/module.service';
 import { My_Helper } from 'src/MY-HELPER-CLASS';
@@ -21,7 +22,8 @@ export class LessonService {
                 private groupService : GroupService , 
                 private teacherService : TeacherService , 
                 private sectionService : SectionService , 
-                private moduleService : ModuleService
+                private moduleService : ModuleService , 
+                private currentSemeseterService : CurrentSemesterService
   ) { }
 
 
@@ -220,7 +222,7 @@ async update(id: number, updateLessonDto: UpdateLessonDto) {
   async teacherTimeTable(teacher_Id : number) {
     let teacher = await this.teacherService.findTeacherByIdOrThrowExp(teacher_Id);
  try {
-     let teacherLessons = await this.lessonRepository.query(`SELECT * FROM lesson where lesson.teacher_Id = ${teacher_Id} order by lesson.created_at `);
+     let teacherLessons = await this.lessonRepository.query(`SELECT * FROM lesson where lesson.teacher_Id = ${teacher_Id} order by lesson.startingTime `);
      
      for ( let x = 0 ; x < teacherLessons.length ; x ++) { 
         let sale = await this.saleService.findSaleByIdOrThrowExp(teacherLessons[x].sale_Id);
@@ -251,9 +253,10 @@ async update(id: number, updateLessonDto: UpdateLessonDto) {
 
 
 async teacherSchedule(teacher_Id : number) {
+  let currentSemester = await this.currentSemeseterService.getCurrentSemester();
   let teacher = await this.teacherService.findTeacherByIdOrThrowExp(teacher_Id);
 try {
-   let teacherLessons = await this.lessonRepository.find({select : [ 'id','day' ,'startingTime','semester', 'endingTime' , 'lesson_Type' ,] ,where : {teacher : teacher} , relations : ['teacher', "module",'group', "sale" ] , order : {startingTime:'ASC'}} );
+   let teacherLessons = await this.lessonRepository.find({select : [ 'id','day' ,'startingTime','semester', 'endingTime' , 'lesson_Type' ,] ,where : {teacher : teacher , semester : currentSemester.current_semester} , relations : ['teacher', "module",'group', "sale" ] , order : {startingTime:'ASC'}} );
    
    let sunday = teacherLessons.filter(({day}) => day == 1);
    let monday = teacherLessons.filter(({day}) => day == 2);

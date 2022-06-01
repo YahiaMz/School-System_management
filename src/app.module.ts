@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Admin } from './admin/admin.entity';
+import { Admin } from './admin/entities/admin.entity';
 import { AdminModule } from './admin/admin.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -31,6 +31,10 @@ import {Module as ModuleEntity} from './module/module.entity';
 import { MarksModule } from './marks/marks.module';
 import { MessagesModule } from './messages/messages.module';
 import { Message } from './messages/entities/message.entity';
+import { ChapterFileModule } from './chapter-file/chapter-file.module';
+import { ChapterFile } from './chapter-file/entities/chapter-file.entity';
+import { CurrentSemester } from './current-semester/entities/current-semester.entity';
+import { CurrentSemesterModule } from './current-semester/current-semester.module';
 
 
 
@@ -68,9 +72,9 @@ imports: [TypeOrmModule.forRoot({
     entities: [
       Teacher , Admin , ModuleEntity , 
       Student  , Batch , Level , Speciality , 
-      Group  ,
+      Group  , CurrentSemester ,
       New , Chapter , Timetable ,
-       Lesson , Sale , Message
+       Lesson , Sale , Message , ChapterFile
     ],
     synchronize: true,
     autoLoadEntities : true 
@@ -86,7 +90,8 @@ imports: [TypeOrmModule.forRoot({
   NewModule,
   ChapterModule,
   SaleModule,  
-  LessonModule,MarksModule, MessagesModule , 
+  LessonModule,MarksModule, MessagesModule, ChapterFileModule , 
+  CurrentSemesterModule
 
 ],
   controllers: [AppController],

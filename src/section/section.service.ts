@@ -2,6 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BatchService } from 'src/batch/batch.service';
 import { GroupService } from 'src/group/group.service';
+import { LevelService } from 'src/level/level.service';
 import { My_Helper } from 'src/MY-HELPER-CLASS';
 import { Speciality } from 'src/speciality/entities/speciality.entity';
 import { Repository } from 'typeorm';
@@ -15,7 +16,8 @@ export class SectionService {
   constructor (@InjectRepository(Section) private sectionRepo : Repository<Section> , 
   @InjectRepository(Speciality) private specialityRepo : Repository<Speciality>  , 
   private batchService : BatchService , 
-  private groupService  : GroupService
+  private groupService  : GroupService ,
+  private levelService  : LevelService
   ) { }
 
 
@@ -49,6 +51,8 @@ async findSpeciality_In_Batch( batch_Id : number , spec_Id : number ){
   
   try {
     let specialityInBatch = await this.sectionRepo.query(`SELECT * FROM level inner join speciality on speciality.level_Id = level.id where level.id = ${batch.level}` );
+     console.log(specialityInBatch);
+     
     if(specialityInBatch.length > 0) { 
       return specialityInBatch[0];
     }
@@ -68,9 +72,14 @@ async findSpeciality_In_Batch( batch_Id : number , spec_Id : number ){
     let batch = await this.batchService.findBatchByIdOrThrow_Exp(createSectionDto.batch_Id);
     let speciality = null;
     if ( createSectionDto.speciality_Id ) { 
-       speciality =  await this.findSpecialityByIdOrThrowExp(createSectionDto.speciality_Id);
+        speciality =  await this.findSpecialityByIdOrThrowExp(createSectionDto.speciality_Id);
         let specialityInBatch = await this.findSpeciality_In_Batch(createSectionDto.batch_Id , createSectionDto.speciality_Id);
-       }
+       }else {
+         let doesThisLevelhasSpecialities = await this.levelService.doesThisLevelHasSpecialities(batch.level)
+         if(doesThisLevelhasSpecialities) { 
+          throw new HttpException(My_Helper.FAILED_RESPONSE('this batch is in a level witch has specialities so you must select one before you insert ') , 201);
+         }
+        }
   let section;
  try {
   section = this.sectionRepo.create({name : createSectionDto.name , batch  : batch , 

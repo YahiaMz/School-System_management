@@ -215,6 +215,22 @@ export class LevelService {
   }
 
 
+  public async doesThisLevelHasSpecialities (  level_Id : number)  :Promise<boolean> {
+
+    let level;
+    
+    try {
+        level = await this.levelRepo.findOne( {relations : ['specialities'] , where : {id :level_Id }});
+      } catch ( e ) { 
+        throw (new HttpException(My_Helper.FAILED_RESPONSE('Something wrong ! ') , 201))
+     } 
+     if(level)
+      return level.specialities.length != 0 ;
+      else return false;
+
+  }
+
+
 
 
 }

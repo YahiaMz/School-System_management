@@ -6,11 +6,12 @@ import { Section } from './entities/section.entity';
 import { Speciality } from 'src/speciality/entities/speciality.entity';
 import { BatchModule } from 'src/batch/batch.module';
 import { GroupModule } from 'src/group/group.module';
+import { LevelModule } from 'src/level/level.module';
 
 @Module({
   controllers: [SectionController],
   providers: [SectionService] , 
-  imports : [TypeOrmModule.forFeature([Section , Speciality]) , BatchModule , GroupModule] , 
+  imports : [TypeOrmModule.forFeature([Section , Speciality]) , BatchModule , GroupModule , LevelModule] , 
   exports : [SectionService]
 })
 export class SectionModule {}

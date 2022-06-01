@@ -17,9 +17,6 @@ export class Mark {
     @Column({type : 'int' , unsigned : true , nullable : true ,default : null})
     cc : number ;
 
-
-    @Column({})
-
     @ManyToOne(type => Student , {nullable : false , onDelete : 'CASCADE' , onUpdate : 'CASCADE'} )
     @JoinColumn({name : 'student_Id' , referencedColumnName : 'id'})
     student : Student;
