@@ -27,7 +27,7 @@ export class StudentService {
                   private groupService : GroupService , 
                   private batchService : BatchService , 
                   private sectionService : SectionService , 
-                  private speciality_Service : SpecialityService 
+                  private speciality_Service : SpecialityService ,
     ) { }
     private salt : number = 9;
 
@@ -168,7 +168,7 @@ async studentLogin( loginStudentDto : LoginStudentDto ) {
 
     let student;
     try { 
-         student = await this.studentRep.findOne( { email : loginStudentDto.email} );
+         student = await this.studentRep.findOne( { where : {email : loginStudentDto.email} , relations : ['group' , 'section' , 'batch' ,'speciality']} );
        } catch (e) {
          console.log(e.message)
          throw (( new HttpException({ 
@@ -185,8 +185,13 @@ async studentLogin( loginStudentDto : LoginStudentDto ) {
   } , 201)));
     
   delete student.password;
+  let batchWithLevel = await this.batchService.findBatchAndItCurrentLevelByIdOrThrowException(student.batch.id);
+  delete student.batch ;
+  student ['batch'] = batchWithLevel;
+
   return student;
 }
+
 
 
 

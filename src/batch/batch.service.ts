@@ -105,6 +105,28 @@ try {
   }
 
 
+  public async findBatchAndItCurrentLevelByIdOrThrowException(id: number) {
+    let batch; 
+    try {
+       batch = await this.batchRepo.findOneOrFail(
+         {  id : id   } ,
+         {  relations : ['level']
+           } );
+
+       return batch;
+     
+
+      } catch (e) {
+        console.log(e.message);
+        
+        throw ( 
+          new HttpException(My_Helper.FAILED_RESPONSE('Batch not found !') , 201)
+          ); 
+     }
+  }
+
+
+
   // you're using this function in chapter , with the help of dependency injection dp
 public async findBatchByIdOrThrow_Exp( id : number) {
   let batch; 
