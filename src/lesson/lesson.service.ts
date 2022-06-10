@@ -278,8 +278,38 @@ try {
    throw new HttpException(My_Helper.FAILED_RESPONSE(' something wrong ' + error.message) , 201);
 }
 
+
 }
 
+
+async groupSchedule(teacher_Id : number) {
+  let currentSemester = await this.currentSemeseterService.getCurrentSemester();
+  let group = await this.groupService.findGroupByIdOrThrowExp(teacher_Id);
+try {
+   let teacherLessons = await this.lessonRepository.find({select : [ 'id','day' ,'startingTime','semester', 'endingTime' , 'lesson_Type' ,] ,where : {group : group , semester : currentSemester.current_semester} , relations : ['teacher', "module",'group', "sale" ] , order : {startingTime:'ASC'}} );
+   
+   let sunday = teacherLessons.filter(({day}) => day == 1);
+   let monday = teacherLessons.filter(({day}) => day == 2);
+   let tuesday = teacherLessons.filter(({day}) => day == 3);
+   let wednesday = teacherLessons.filter(({day}) => day == 4);
+   let thursday = teacherLessons.filter(({day}) => day == 5);
+
+
+    
+    return {
+      'sunday' : sunday , 
+      "monday" : monday , 
+      "tuesday" : tuesday , 
+      "wednesday" : wednesday , 
+      "thursday" : thursday
+    };
+
+} catch (error) {
+   throw new HttpException(My_Helper.FAILED_RESPONSE(' something wrong ' + error.message) , 201);
+}
+
+
+}
 
 
 

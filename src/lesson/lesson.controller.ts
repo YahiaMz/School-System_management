@@ -49,6 +49,13 @@ export class LessonController {
   }
 
 
+  @Get('/ofGroup/:id')
+  async groupLessons(@Param('id') id: string) {
+    let lessons =  await this.lessonService.groupSchedule(+id);
+    return My_Helper.SUCCESS_RESPONSE(lessons);
+  }
+
+
 
   @Patch('/update/:id')
   update(@Param('id') id: string, @Body() updateLessonDto: UpdateLessonDto) {
