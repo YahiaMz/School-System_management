@@ -31,9 +31,10 @@ export class MarksController {
     return My_Helper.SUCCESS_RESPONSE(marksOfStudent)
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.marksService.findOne(+id);
+  @Get('/ofGroup=:id/InModule=:mId')
+  async findOne(@Param('id') id: string , @Param('mId') mId) {
+    let marksOfGroup = await this.marksService.findMarksOfGroup(+id , +mId);
+    return My_Helper.SUCCESS_RESPONSE(marksOfGroup)
   }
 
   @Patch(':id')

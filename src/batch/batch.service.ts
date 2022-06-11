@@ -48,7 +48,15 @@ try {
    for (let x : number =0 ; x < batches.length ; x ++ ) {
      
      let sectionsOfBatch = await this.batchRepo.query(`SELECT section.* , speciality.shortName from section left join speciality on speciality.id = section.speciality_Id where section.batch_Id = ${batches[x].id}`)
-    
+     let specialitiesOfThisBatch = await this.batchRepo.query(`SELECT * FROM speciality s where s.level_Id = ${batches[x].level.id} `)
+     
+     if(specialitiesOfThisBatch.length > 0) {
+      batches[x]['hasSpecialities'] = true ;
+      batches[x]['specialities'] = specialitiesOfThisBatch;
+     }  else {
+      batches[x]['hasSpecialities'] = false ;
+     }
+
      batches[x]['sections'] = sectionsOfBatch;
     }
 
