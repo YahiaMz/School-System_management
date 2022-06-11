@@ -38,7 +38,10 @@ try {
          ws.write(file.buffer);
             
         let newChapterFile = this.chapterFileRepo.create({name : createChapterFileDto.fileName , fileUrl : chapterFileName , chapter : chapter });
-        return await this.chapterFileRepo.save(newChapterFile);
+         delete  newChapterFile.chapter ;
+         newChapterFile['chapter'] = chapter;
+         
+         return await this.chapterFileRepo.save(newChapterFile);
 
         } catch (error) {
           

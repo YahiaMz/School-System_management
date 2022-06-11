@@ -29,6 +29,18 @@ export class GroupService {
   
   }
 
+  public async findJustTheGroupByIdOrThrowExp ( id : number ) : Promise<Group> {
+    try {
+      let group = await this.groupRepository.findOne({id : id});
+      if (group) return group;
+    } catch (error) {
+      throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong !') , 201);
+    }
+  
+    throw new HttpException(My_Helper.FAILED_RESPONSE(`group not found`) , 201);
+  
+  }
+
   
   private async findSectionAndItBatchAndItSpecialityIfExistByIdOrThrowExp( id : number ) { 
     try {
@@ -62,7 +74,9 @@ export class GroupService {
   try {
     let group = await this.groupRepository.findOne(
      { 
-     where : {id : group_Id},
+     where : {
+      id : group_Id , 
+    },
      relations : ['news']
      });
     if (group) return group;

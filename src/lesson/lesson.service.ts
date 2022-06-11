@@ -282,9 +282,9 @@ try {
 }
 
 
-async groupSchedule(teacher_Id : number) {
+async groupSchedule(group_Id : number) {
   let currentSemester = await this.currentSemeseterService.getCurrentSemester();
-  let group = await this.groupService.findGroupByIdOrThrowExp(teacher_Id);
+  let group = await this.groupService.findJustTheGroupByIdOrThrowExp(group_Id);
 try {
    let teacherLessons = await this.lessonRepository.find({select : [ 'id','day' ,'startingTime','semester', 'endingTime' , 'lesson_Type' ,] ,where : {group : group , semester : currentSemester.current_semester} , relations : ['teacher', "module",'group', "sale" ] , order : {startingTime:'ASC'}} );
    

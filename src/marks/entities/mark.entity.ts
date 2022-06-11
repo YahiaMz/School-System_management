@@ -1,20 +1,25 @@
 import { Module } from "src/module/module.entity";
 import { Student } from "src/student/student.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 
 @Entity()
+@Unique(['student' , 'module'])
 export class Mark {
 
     @PrimaryGeneratedColumn()
     id:number;
 
-    @Column({type : 'int' , unsigned : true , nullable : true ,default : null})
+
+    @Column({type : 'tinyint' , nullable : false , default : 1 })
+    semester : number;
+
+    @Column({type : 'double' , unsigned : true , nullable : true ,default : null})
     emd1 : number ;
 
-    @Column({type : 'int' , unsigned : true , nullable : false ,default : null})
+    @Column({type : 'double' , unsigned : true , nullable : true ,default : null})
     emd2 : number ;
     
-    @Column({type : 'int' , unsigned : true , nullable : true ,default : null})
+    @Column({type : 'double' , unsigned : true , nullable : true ,default : null})
     cc : number ;
 
     @ManyToOne(type => Student , {nullable : false , onDelete : 'CASCADE' , onUpdate : 'CASCADE'} )

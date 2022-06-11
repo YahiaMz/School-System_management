@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Post } from '@nestjs/common';
 import { My_Helper } from 'src/MY-HELPER-CLASS';
 import { CurrentSemesterService } from './current-semester.service';
 
@@ -17,9 +17,8 @@ export class CurrentSemesterController {
       }
 
 
-  @Get('/changeTo/:currentSemester')
+  @Post('/changeTo/:currentSemester')
   async changeCurrentSemester( @Param('currentSemester') currentSemester : string ){
-    console.log(currentSemester);
     
        let cSemester = await this.currentSemesterService.changeCurrentSemester(currentSemester)
         return await My_Helper.SUCCESS_RESPONSE(cSemester.current_semester);
