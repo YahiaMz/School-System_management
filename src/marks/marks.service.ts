@@ -202,16 +202,20 @@ export class MarksService {
   let current_semester = await this.currentSemesterService.getCurrentSemester();
 
   try {
-
-    let marksOfGroup = await this.markRepository.query(`
-  SELECT s.id as 'student_Id' , s.name , s.lastName , s.profileImage ,
-   m.emd1 , m.emd2 , m.cc , m.semester  , !( m.cc is null or m.emd1 is null or m.emd2 is null ) as 'canShowAvg' 
-  FROM student s left join mark m on s.id = m.student_Id inner join \`group\` g on s.group_Id = g.id
+    
+  let marksOfGroup =  await this.markRepository.query(`
+    SELECT s.id as 'student_Id' , s.name , s.lastName , s.profileImage ,
+    md.* , 
+    m.emd1 , m.emd2 , m.cc , m.semester  , !( m.cc is null or m.emd1 is null or m.emd2 is null ) as 'canShowAvg' 
+    FROM student s left join mark m on s.id = m.student_Id inner join \`group\` g on s.group_Id = g.id
+    inner join module md on md.id = m.module_Id  
   where g.id = ${id} and m.id = ${module_Id}
     ` 
   );
 
-   return marksOfGroup;
+
+//let marksOfGroup = await this.markRepository.query(``);
+return marksOfGroup;
   
   }   
    catch (error) {

@@ -9,8 +9,9 @@ export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
   @Post('/create')
-  create(@Body() createGroupDto: CreateGroupDto) {
-    return this.groupService.create(createGroupDto);
+  async create(@Body() createGroupDto: CreateGroupDto) {
+     let newGrp = await this.groupService.create(createGroupDto);
+    return My_Helper.SUCCESS_RESPONSE(newGrp);
   }
 
   @Get('/all/ofSection=:section_Id')
