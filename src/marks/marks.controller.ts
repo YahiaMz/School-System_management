@@ -31,9 +31,9 @@ export class MarksController {
     return My_Helper.SUCCESS_RESPONSE(marksOfStudent)
   }
 
-  @Get('/ofGroup=:id/InModule=:mId')
-  async findOne(@Param('id') id: string , @Param('mId') mId) {
-    let marksOfGroup = await this.marksService.findMarksOfGroup(+id , +mId);
+  @Get('/ofStudent=:sId/ByTeacher=:tId')
+  async findOne(@Param('sId') id: string , @Param('tId') tId) {
+    let marksOfGroup = await this.marksService.findMarksOfGroup(+id , +tId);
     return My_Helper.SUCCESS_RESPONSE(marksOfGroup)
   }
 

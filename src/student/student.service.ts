@@ -133,7 +133,7 @@ export class StudentService {
     }
 
 
-    async findStudentByIdOrThrowException ( idStudent : number ) {
+    async   findStudentByIdOrThrowException ( idStudent : number ) {
 
       if (isNaN(idStudent)) {
         throw (( new HttpException({ 
@@ -161,6 +161,30 @@ export class StudentService {
        return student;
 
   }
+
+  async   findStudentAndHimGroupByIdOrThrowException ( idStudent : number ) {
+
+   let student;
+   try { 
+      student = await this.studentRep.findOne({ where : { id : idStudent } , relations : ['group'] });
+   }catch (e) {
+        throw ( new HttpException( { success : false , 
+       statusCode : 201 , 
+       message : 'Something wrong !'
+   } , 201))
+    }
+
+
+    if (!student)  throw (( new HttpException({ 
+     success : false , 
+     message : 'Student not found '
+ } , 201)));
+
+    return student;
+
+}
+
+
 
 
 

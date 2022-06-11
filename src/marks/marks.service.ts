@@ -197,25 +197,44 @@ export class MarksService {
 
 
 
- async findMarksOfGroup(id: number , module_Id : number) {
+ async findMarksOfGroup(student_Id: number , teacher_Id : number) {
 
   let current_semester = await this.currentSemesterService.getCurrentSemester();
+  let groupStudent = await this.studentService.findStudentAndHimGroupByIdOrThrowException(student_Id);
+
+  let moduleOfTeacher ;
+
+
+ let whatTeacherTeachInThisGroup = await this.markRepository.query(`SELECT distinct m.id , m.name , m.shortName , m.imageUrl  from teacher t  inner join lesson l on
+     l.teacher_Id = t.id  INNER JOIN module m 
+     on l.module_Id  = m.id where l.teacher_Id = ${teacher_Id} and l.group_Id = ${groupStudent.group.id};`);
+
 
   try {
     
-  let marksOfGroup =  await this.markRepository.query(`
+  for (let x = 0 ; x < whatTeacherTeachInThisGroup.length ; x++) {
+     let stdMarkRow = await this.findStudentMarkRowInModule(groupStudent , whatTeacherTeachInThisGroup[x] , current_semester.current_semester);
+     if (stdMarkRow ) {
+      delete stdMarkRow.module;
+      whatTeacherTeachInThisGroup[x]['isThereMarkRow'] = true;
+      whatTeacherTeachInThisGroup[x]['markRow'] = stdMarkRow;
+     } else {
+      whatTeacherTeachInThisGroup[x]['isThereMarkRow'] = false;
+     }
+  }
+
+  /* await this.markRepository.query(`
     SELECT s.id as 'student_Id' , s.name , s.lastName , s.profileImage ,
     md.* , 
     m.emd1 , m.emd2 , m.cc , m.semester  , !( m.cc is null or m.emd1 is null or m.emd2 is null ) as 'canShowAvg' 
     FROM student s left join mark m on s.id = m.student_Id inner join \`group\` g on s.group_Id = g.id
     inner join module md on md.id = m.module_Id  
-  where g.id = ${id} and m.id = ${module_Id}
-    ` 
-  );
+    where g.id = ${id} and m.id = ${module_Id} ` 
+  ); */
 
 
 //let marksOfGroup = await this.markRepository.query(``);
-return marksOfGroup;
+return whatTeacherTeachInThisGroup;
   
   }   
    catch (error) {
