@@ -51,6 +51,10 @@ public static is_Lecture ( mimetype  ) : boolean {
   return lecture_Extinctions.includes(My_Helper.fileExtinction( mimetype ));
 }
 
+public  static isXLSX_File( mimetype ) : boolean {
+  return this.fileExtinction(mimetype) == ".xlsx";
+}
+
  //// { End Helper Functions }
 
 

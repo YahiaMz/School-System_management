@@ -45,7 +45,7 @@ export class TeacherController {
     @Post('login')
     async login(@Body( ) body : LoginTeacherDto) {
     
-        let teacher = await this.teacherService.TeacherLogin(body );
+        let teacher = await this.teacherService.TeacherLogin(body);
     return My_Helper.SUCCESS_RESPONSE(teacher);
 
     }
@@ -75,6 +75,28 @@ export class TeacherController {
         let uTeacher =  await this.teacherService.updateProfilePicture(+teacher_Id , file);
         return My_Helper.SUCCESS_RESPONSE(uTeacher);
     }  
+
+
+
+
+     @Post('/addByExcelFile/')
+     @UseInterceptors(FileInterceptor('file'))
+     async addByExcelFile( @UploadedFile() file : Express.Multer.File ){
+       
+         if ( !file || !My_Helper.isXLSX_File(file.mimetype) ) {
+             return My_Helper.FAILED_RESPONSE('File must be not null and of type {.xlxs}')
+          }
+
+
+          let newTeachers = await this.teacherService.addTeachersByExcelFile(file);
+          return My_Helper.SUCCESS_RESPONSE(newTeachers);
+    
+    
+        }  
+
+
+
+
 
     @Get('/profile-images/:profileImage')
     async sendProfileImage ( @Param('profileImage') profileImage : string , @Res() res ){ 

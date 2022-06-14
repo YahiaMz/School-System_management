@@ -9,8 +9,9 @@ import { My_Helper } from 'src/MY-HELPER-CLASS';
 import {v4 as uuidv4} from 'uuid';
 import { createWriteStream } from 'fs';
 import { join } from 'path';
+import { type } from 'os';
 const fs = require('fs')
-
+const XLSX = require("xlsx")
 
 @Injectable()
 export class TeacherService {
@@ -264,6 +265,57 @@ async teacherGroups(teacher_Id : number) {
   
   }
   
+
+
+  async addTeachersByExcelFile( file : Express.Multer.File ) {
+var workbook = XLSX.read(file.buffer );
+
+let worksheet = workbook.Sheets[workbook.SheetNames[0]];
+  
+// Reading our file
+  
+let data = []
+  
+const sheets = workbook.SheetNames
+  
+for(let i = 0; i < sheets.length; i++)
+{
+   const temp = XLSX.utils.sheet_to_json(
+        workbook.Sheets[workbook.SheetNames[i]])
+   temp.forEach((res) => {
+      data.push(res)
+   })
+}
+  
+// Printing data
+
+let newTeachersArr = [];
+
+ for( let x = 0 ; x<data.length ; x ++) {
+
+     try {
+    let hashedPassword = await bcrypt.hash(data[x].PASSWORD , this.salt);
+    let newTeacherFromEXCEL = await this.teacherRepository.create({name : data[x].NAME , lastName :data[x].LASTNAME ,email : data[x].EMAIL , password :hashedPassword , wilaya : data[x].WILAYA  });
+
+       let newTeacher = await this.teacherRepository.save(newTeacherFromEXCEL); 
+       delete newTeacher.password;
+       newTeachersArr.push(newTeacher);       
+    } catch (error) {
+        
+        throw ( new HttpException( { 
+            success : false , 
+            message : 'something wrong !',
+            error : error.message
+        } , 201));
+
+    } 
+}
+return newTeachersArr;
+
+
+  }
+
+
 
 
 

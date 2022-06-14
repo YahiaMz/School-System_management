@@ -213,6 +213,25 @@ constructor( @InjectRepository(Module) private moduleRepository : Repository<Mod
 
      } 
 
+
+     async listAllModulesOfGroup ( group_Id : number) { 
+
+
+ 
+        try { 
+            let modulesOfThisGroup = await this.moduleRepository.query(`SELECT DISTINCT m.* from lesson l inner join module m on m.id = l.module_Id where l.group_Id = ${group_Id} `);
+             return modulesOfThisGroup;
+            } catch ( error ) { 
+            throw (new HttpException({ 
+                success : false , 
+                message : 'something wrong !',
+                error : error.message
+            } , 201))
+          }
+
+     } 
+
+
     async remove( id : number ){
         
         let moduleToRemove ;

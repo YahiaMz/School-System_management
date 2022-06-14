@@ -1,5 +1,6 @@
 import { BadRequestException, Body, Controller, Delete, Get, HttpException, Param, Patch, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { group } from 'console';
 import { My_Helper } from 'src/MY-HELPER-CLASS';
 import { CreateModuleDto } from './dtos/create-module.dto';
 import { updateModuleDto } from './dtos/updateModule.dto';
@@ -41,10 +42,20 @@ constructor ( private moduleService : ModuleService ) {}
     @Get('/all')
     async list ( ) { 
         let modules = await this.moduleService.listAll();
-   
+
         return My_Helper.SUCCESS_RESPONSE(modules);
    
     }
+
+
+    @Get('/OfGroup/:group_Id')
+    async listModulesOfGroup (@Param('group_Id') group_Id : number ) { 
+        let modules = await this.moduleService.listAll();
+
+        return My_Helper.SUCCESS_RESPONSE(modules);
+   
+    }
+
 
 
     @Post('/update_image/:module_Id') 
