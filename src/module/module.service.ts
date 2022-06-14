@@ -11,13 +11,15 @@ import { join } from 'path';
 const fs = require('fs')
 import { updateModuleDto } from './dtos/updateModule.dto';
 import { SpecialityService } from 'src/speciality/speciality.service';
+import { CurrentSemesterService } from 'src/current-semester/current-semester.service';
 
 @Injectable()
 export class ModuleService {
 
 constructor( @InjectRepository(Module) private moduleRepository : Repository<Module> , 
              @InjectRepository(Level) private levelRepo : Repository<Level> , 
-             private specialityService :  SpecialityService 
+             private specialityService :  SpecialityService  , 
+             private currentSemesterService : CurrentSemesterService
 ){}
 
 
@@ -230,6 +232,30 @@ constructor( @InjectRepository(Module) private moduleRepository : Repository<Mod
           }
 
      } 
+
+     async listAllModulesOfLevel ( level_Id : number) { 
+
+        let level = await this.findLevelByIdOrThrowExp(level_Id);
+        let current_semester = await this.currentSemesterService.getCurrentSemester();
+      
+ 
+        try { 
+            let modulesOfThisGroup = await this.moduleRepository.find({where : { level : level , semester : current_semester.current_semester}});
+             return modulesOfThisGroup;
+            } catch ( error ) { 
+            throw (new HttpException({ 
+                success : false , 
+                message : 'something wrong !',
+                error : error.message
+            } , 201))
+          }
+
+     } 
+
+
+
+
+
 
 
     async remove( id : number ){

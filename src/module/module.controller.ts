@@ -50,11 +50,24 @@ constructor ( private moduleService : ModuleService ) {}
 
     @Get('/OfGroup/:group_Id')
     async listModulesOfGroup (@Param('group_Id') group_Id : number ) { 
-        let modules = await this.moduleService.listAll();
 
+        let modules = await this.moduleService.listAllModulesOfGroup(group_Id);
         return My_Helper.SUCCESS_RESPONSE(modules);
    
     }
+
+
+
+    @Get('/OfLevel/:level_Id')
+        async listModulesOfLevel (@Param('level_Id') level_Id : number ) { 
+            
+        let modules = await this.moduleService.listAllModulesOfLevel(level_Id);
+        return My_Helper.SUCCESS_RESPONSE(modules);
+   
+    }
+
+
+
 
 
 
