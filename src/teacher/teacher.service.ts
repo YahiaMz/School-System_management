@@ -270,8 +270,6 @@ async teacherGroups(teacher_Id : number) {
 
   async addTeachersByExcelFile( file : Express.Multer.File ) {
 var workbook = XLSX.read(file.buffer );
-
-let worksheet = workbook.Sheets[workbook.SheetNames[0]];
   
 // Reading our file
   
@@ -292,15 +290,16 @@ for(let i = 0; i < sheets.length; i++)
 
 let newTeachersArr = [];
 
- for( let x = 0 ; x<data.length ; x ++) {
+ for( let x = 0 ; x<data.length - 1 ; x ++) {
 
      try {
-    let hashedPassword = await bcrypt.hash(data[x].PASSWORD , this.salt);
-    let newTeacherFromEXCEL = await this.teacherRepository.create({name : data[x].NAME , lastName :data[x].LASTNAME ,email : data[x].EMAIL , password :hashedPassword , wilaya : data[x].WILAYA  });
+    let hashedPassword = await bcrypt.hash(data[x].PASSWORD , this.salt );
+    let newTeacherFromEXCEL =  this.teacherRepository.create({name : data[x].NAME , lastName :data[x].LASTNAME ,email : data[x].EMAIL , password :hashedPassword , wilaya : data[x].WILAYA , dateOfBirth : data[x].DATEOFBIRTH  });
 
        let newTeacher = await this.teacherRepository.save(newTeacherFromEXCEL); 
        delete newTeacher.password;
-       newTeachersArr.push(newTeacher);       
+       newTeachersArr.push(newTeacher); 
+
     } catch (error) {
         
         throw ( new HttpException( { 

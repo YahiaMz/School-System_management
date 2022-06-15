@@ -126,6 +126,35 @@ return section;
   }
 
 
+
+  async findSectionAnItGroupsById( section_Id : number) { 
+    let section = null;
+    
+    try {
+      section = await this.sectionRepo.findOne({
+        where : {id : section_Id},
+        relations : [
+         "groups" ,
+      ]
+       });
+
+       if(section) {
+        return section;
+       }
+
+   }catch (e) {
+    throw new HttpException( 
+      My_Helper.FAILED_RESPONSE('something wrong while finding Section ')
+     , 201)  
+   }
+
+   throw new HttpException( 
+    My_Helper.FAILED_RESPONSE('section not found ')
+   , 201) 
+
+}
+
+
   async findOne(section_Id: number) {
     let section = null;
     

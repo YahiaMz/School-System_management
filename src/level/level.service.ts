@@ -58,6 +58,11 @@ export class LevelService {
    if(!level) throw (new HttpException(My_Helper.FAILED_RESPONSE('level not Exist !') , 201))
    let currentBatch = await this.levelRepo.query(`select * from batch where batch.level_Id = ${level.id}`);
    
+   if(currentBatch.length == 0) {
+    throw (new HttpException(My_Helper.FAILED_RESPONSE('there is no batch in this level !') , 201))
+   }
+
+
    level['currentBatch'] = currentBatch[0];
    if(level.specialities.length == 0) {
      delete level.specialities;
@@ -86,6 +91,38 @@ export class LevelService {
 
 
 
+
+ public async getAllInformationAboutLevel( level_Id : number ){ 
+  let level;
+  try {
+      level = await this.levelRepo.findOne({id : level_Id} , {relations : ['specialities']});
+    } catch ( e ) { 
+      throw (new HttpException(My_Helper.FAILED_RESPONSE('Something wrong !') , 201))
+   } 
+
+   if(!level) throw (new HttpException(My_Helper.FAILED_RESPONSE('level not Exist !') , 201))
+   let currentBatch = await this.levelRepo.query(`select * from batch where batch.level_Id = ${level.id}`);
+   
+   if(currentBatch.length == 0) {
+    throw (new HttpException(My_Helper.FAILED_RESPONSE('there is no batch in this level !') , 201))
+   }
+
+   level['currentBatch'] = currentBatch[0];
+   if(level.specialities.length == 0) {
+     delete level.specialities;
+     level['hasSpecialities'] = false ;
+     let sections = await this.findSectionsOfBatch(currentBatch[0].id);
+     level['sections'] = sections;
+
+   } else { 
+    level['hasSpecialities'] = true ;   
+   }
+   
+   return level;
+
+
+ }
+
  private async findSectionsOfBatch( batch_Id : number) { 
   try {
     
@@ -94,7 +131,6 @@ export class LevelService {
 } catch (error) {
 
   throw ( 
-
     new HttpException(My_Helper.FAILED_RESPONSE(`Something wrong ! , $error.message}`) , 201)
     );
 } 

@@ -21,6 +21,22 @@ async createNewStudent( @Body() createStudentDto : CreateStudentDto) {
      return My_Helper.SUCCESS_RESPONSE(newStudent); 
 }
 
+@Post('/addByExcelFile/InLevel=:level_Id')
+@UseInterceptors(FileInterceptor('file'))
+async addByExcelFile(@Param('level_Id') level_Id : string ,  @UploadedFile() file : Express.Multer.File ){
+  
+    if ( !file || !My_Helper.isXLSX_File(file.mimetype) ) {
+        return My_Helper.FAILED_RESPONSE('File must be not null and of type {.xlxs}')
+     }
+
+
+     let newStudents = await this.studentService.addStudentByExcelFileInLevel(file , +level_Id);
+     return My_Helper.SUCCESS_RESPONSE(newStudents);
+
+
+   }  
+
+
 
 @Post('/login')
 async login(@Body() body : LoginStudentDto) { 

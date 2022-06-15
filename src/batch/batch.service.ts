@@ -151,6 +151,23 @@ public async findBatchByIdOrThrow_Exp( id : number) {
 
 }
 
+public async findBatchByLevel_IdOrThrow_Exp( level_Id : number) {
+  let batch; 
+    try {
+        batch = await this.batchRepo.query(`select * from batch b where b.level_Id = ${level_Id}`);
+        if(batch.length > 0) {
+          return batch[0];
+        }
+      } catch (error) {
+       throw (new HttpException(My_Helper.FAILED_RESPONSE('something wrong !') , 201))
+     }
+
+       throw new HttpException( My_Helper.FAILED_RESPONSE('batch not found !') , 201);
+     
+
+}
+
+
 
   async update(id: number, attrs : UpdateBatchDto) {
         console.log(attrs);

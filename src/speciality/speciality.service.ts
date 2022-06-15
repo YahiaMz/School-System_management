@@ -296,6 +296,27 @@ export class SpecialityService {
 }
 
 
+async  findSpecialityBy__IdWithItsSections(speciality_Id: number , batch_Id : number) {
+  let speciality;
+  try {
+    
+    speciality = await this.specialityRepo.findOne({id : speciality_Id });
+     if( speciality ) { 
+       let sectionsOfSpeciality = await this.batchRepo.query(`
+       SELECT * FROM section where section.batch_Id = ${batch_Id} and section.speciality_Id = ${speciality.id}`)
+      return sectionsOfSpeciality;
+     }
+    } catch (error) {
+
+     throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong') , 201);
+  }
+
+  if (!speciality) { 
+    throw new HttpException(My_Helper.FAILED_RESPONSE('Speciality not found !') , 201);
+  }
+}
+
+
 
 
 }

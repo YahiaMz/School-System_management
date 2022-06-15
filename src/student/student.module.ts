@@ -8,11 +8,12 @@ import { GroupModule } from 'src/group/group.module';
 import { SectionModule } from 'src/section/section.module';
 import { BatchModule } from 'src/batch/batch.module';
 import { SpecialityModule } from 'src/speciality/speciality.module';
+import { LevelModule } from 'src/level/level.module';
 
 @Module({
   providers: [StudentService],
   controllers: [StudentController] , 
-  imports : [TypeOrmModule.forFeature([Student]) , GroupModule , SectionModule , BatchModule , SpecialityModule  ] , 
+  imports : [TypeOrmModule.forFeature([Student]) , GroupModule , SectionModule , BatchModule , SpecialityModule , LevelModule ] , 
   exports : [StudentService]
 })
 export class StudentModule {}
