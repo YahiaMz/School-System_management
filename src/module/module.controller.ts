@@ -13,7 +13,7 @@ constructor ( private moduleService : ModuleService ) {}
 
     @Post('/create')
     @UseInterceptors(FileInterceptor('image'))
-    async create( @Body() moduleData : CreateModuleDto , @UploadedFile() module_image){         
+    async create( @Body() moduleData : CreateModuleDto , @UploadedFile() module_image : Express.Multer.File){         
 
 
         if( module_image && !My_Helper.is_Image(module_image.mimetype))  { 
