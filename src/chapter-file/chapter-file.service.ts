@@ -38,13 +38,13 @@ try {
          ws.write(file.buffer);
             
         let newChapterFile = this.chapterFileRepo.create({name : createChapterFileDto.fileName , fileUrl : chapterFileName , chapter : chapter });
-         delete  newChapterFile.chapter ;
          
          let newChFile =  await this.chapterFileRepo.save(newChapterFile);
-         delete chapter.files;
-         newChapterFile['chapter'] = chapter;
+         delete newChFile.chapter;
+         
+         chapter.files.push(newChFile);
 
-         return newChFile;
+         return chapter;
         } catch (error) {
           
           await fs.unlinkSync(chapterFilePath);
