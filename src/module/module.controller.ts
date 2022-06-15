@@ -14,6 +14,13 @@ constructor ( private moduleService : ModuleService ) {}
     @Post('/create')
     @UseInterceptors(FileInterceptor('image'))
     async create( @Body() moduleData : CreateModuleDto , @UploadedFile() module_image){         
+
+
+        if( module_image && !My_Helper.is_Image(module_image.mimetype))  { 
+          return ( My_Helper.FAILED_RESPONSE('image must be a [.png , .jpeg , .jpg , .webp]'))
+            }
+
+
        let createdModule = await this.moduleService.createModule(moduleData , module_image);
        return My_Helper.SUCCESS_RESPONSE(createdModule);
     }

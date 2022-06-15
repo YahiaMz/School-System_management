@@ -114,7 +114,7 @@ export class StudentService {
 
         let student;
         try { 
-           student = await this.studentRep.findOne({ id : idStudent} , {relations:['group']});
+           student = await this.studentRep.findOne({ id : idStudent} , {relations:['group','batch','section']});
         }catch (e) {
              throw ( new HttpException( { success : false , 
             statusCode : 201 , 
@@ -222,6 +222,7 @@ async studentLogin( loginStudentDto : LoginStudentDto ) {
 
 async updateStudent( id : number, updateStudent : UpdateStudentDto ) {
      let student = await this.findStudentById(id);
+
      if(updateStudent.group_Id) {
          let group = await this.groupService.findGroupByIdOrThrowExp(updateStudent.group_Id);
          student.group = group;
@@ -242,7 +243,11 @@ async updateStudent( id : number, updateStudent : UpdateStudentDto ) {
 
          try { 
             savedStudent = await this.studentRep.save(student);
-            delete savedStudent.password;
+            delete savedStudent.password; 
+
+            let batchWithLevel = await this.batchService.findBatchAndItCurrentLevelByIdOrThrowException(student.batch.id);
+            savedStudent['level'] = batchWithLevel.level;
+
             return savedStudent;
          }catch ( e ) { 
             throw (new HttpException({ success:false , 
@@ -252,6 +257,9 @@ async updateStudent( id : number, updateStudent : UpdateStudentDto ) {
          }
 
 }
+
+
+
 
 
   async allStudents( ) { 
@@ -265,7 +273,19 @@ async updateStudent( id : number, updateStudent : UpdateStudentDto ) {
       'profileImage' ,
       'created_at'  ,
       'updated_at' 
-   ] , relations : ['group' , "section"]});
+   ] , relations : ['group' , "section" , "batch"]});
+
+
+   for (let x = 0 ; x < students.length ; x ++) { 
+      let batch = await this.batchService.findBatchAndItCurrentLevelByIdOrThrowException(students[x].batch.id);
+      delete students[x].batch;
+      let level = batch.level;
+      delete batch.level;
+
+      students[x]['batch'] = batch;
+      students[x]['level'] = level;
+   }
+
 
  return students;
     }

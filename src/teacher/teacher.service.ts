@@ -238,10 +238,11 @@ export class TeacherService {
          let teacher = await this.findTeacherByIdOrThrowExp(teacher_Id);
  
          try {
+
+            //l.lesson_Type = 'COURS' as 'isTheLecturer'
          
-         let modules = await this.teacherRepository.query(`SELECT distinct m.* , l.lesson_Type = 'COURS' as 'isTheLecturer' from teacher t  inner join lesson l on
-          l.teacher_Id = t.id  INNER JOIN module m 
-         on l.module_Id  = m.id where l.teacher_Id = ${teacher_Id} ;`)
+         let modules = await this.teacherRepository.query(`SELECT m.* , count( case l.lesson_Type when 'COURS' then 1 else null end) as 'IsLecturer' from lesson l  INNER JOIN module m 
+         on l.module_Id  = m.id where l.teacher_Id = ${teacher_Id} group by m.id`)
 
             return modules;
          }
