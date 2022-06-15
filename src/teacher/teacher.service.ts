@@ -241,7 +241,7 @@ export class TeacherService {
 
             //l.lesson_Type = 'COURS' as 'isTheLecturer'
          
-         let modules = await this.teacherRepository.query(`SELECT m.* , count( case l.lesson_Type when 'COURS' then 1 else null end) as 'IsLecturer' from lesson l  INNER JOIN module m 
+         let modules = await this.teacherRepository.query(`SELECT m.* , count( case l.lesson_Type when 'COURS' then 1 else null end) as 'isTheLecturer' from lesson l  INNER JOIN module m 
          on l.module_Id  = m.id where l.teacher_Id = ${teacher_Id} group by m.id`)
 
             return modules;
