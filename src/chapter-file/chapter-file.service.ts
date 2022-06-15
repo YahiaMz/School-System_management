@@ -39,10 +39,12 @@ try {
             
         let newChapterFile = this.chapterFileRepo.create({name : createChapterFileDto.fileName , fileUrl : chapterFileName , chapter : chapter });
          delete  newChapterFile.chapter ;
-         newChapterFile['chapter'] = chapter;
          
-         return await this.chapterFileRepo.save(newChapterFile);
+         let newChFile =  await this.chapterFileRepo.save(newChapterFile);
+         delete chapter.files;
+         newChapterFile['chapter'] = chapter;
 
+         return newChFile;
         } catch (error) {
           
           await fs.unlinkSync(chapterFilePath);
