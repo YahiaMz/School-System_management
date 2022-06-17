@@ -16,6 +16,9 @@ constructor ( private moduleService : ModuleService ) {}
     async create( @Body() moduleData : CreateModuleDto , @UploadedFile() module_image : Express.Multer.File){         
 
 
+        console.log(module_image);
+        
+
         if( module_image && !My_Helper.is_Image(module_image.mimetype))  { 
           return ( My_Helper.FAILED_RESPONSE('image must be a [.png , .jpeg , .jpg , .webp]'))
             }

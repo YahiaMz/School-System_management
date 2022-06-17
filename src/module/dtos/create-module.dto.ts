@@ -2,24 +2,22 @@ import { IsInt, IsNumber, IsNumberString, IsOptional, IsString, Max, Min } from 
 
 export class CreateModuleDto {
 
-    @IsNumber()
+    @IsNumberString()
     level_Id : number;
 
 
-    @IsNumber()
+    @IsNumberString()
     @IsOptional()
     speciality_Id : number;
 
 
-    @IsInt()
-    @Max(2)
-    @Min(1)
+    @IsNumberString()
     semester : number;
 
     @IsString()
     name : string;
 
-    @IsInt()
+    @IsNumberString()
     coef : number;
 
       
