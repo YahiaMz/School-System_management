@@ -8,13 +8,11 @@ export class CreateNewDto
 @IsNumberString()
 teacher_Id : number;
 
- @IsString( )
- object : string;
+@IsString( )
+object : string;
 
- @IsString()
- message : string;
-
-
+@IsString()
+message : string;
 
  @IsArray()
  @Type(type => Number)

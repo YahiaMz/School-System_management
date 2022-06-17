@@ -1,14 +1,15 @@
 import { IsString } from "class-validator";
 import { Chapter } from "src/chapter/entities/chapter.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 
 @Entity()
+@Unique(['name','chapter'])
 export class ChapterFile {
 
     @PrimaryGeneratedColumn()
     id : number ;
 
-    @Column({type : 'varchar' , nullable : false , unique : true})
+    @Column({type : 'varchar' , nullable : false })
     name : string
 
     @Column({type : 'varchar' , nullable : false} )

@@ -13,6 +13,10 @@ export class ChapterFileController {
   @UseInterceptors(FileInterceptor('file'))
   async create(@Body() createChapterFileDto: CreateChapterFileDto , @UploadedFile() file : Express.Multer.File) {
     
+
+    console.log(file);
+    
+
      if ( !file || !My_Helper.is_Lecture(file.mimetype) ) {
        return My_Helper.FAILED_RESPONSE('File must be not null and of type {.pdf}')
     }
