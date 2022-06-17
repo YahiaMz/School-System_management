@@ -10,6 +10,7 @@ import { New } from './entities/new.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { createWriteStream } from 'fs';
 import { join } from 'path';
+import { CreateNewDtoByAdmin } from './dto/create-new-byAdmin.dto';
 
 @Injectable()
 export class NewService {
@@ -62,7 +63,12 @@ private async findTeacherByIdOrThrowExp ( teacher_Id : number) {
 
 
     console.log(file);
-    
+
+
+    if(createNewDto.groups.length == 0 ) { 
+      throw new HttpException( My_Helper.FAILED_RESPONSE('you have to select at least one group') , 201)
+    }
+
 
     let teacher = await this.findTeacherByIdOrThrowExp(createNewDto.teacher_Id);
     let mGroups:Group[] = [];
@@ -104,32 +110,108 @@ private async findTeacherByIdOrThrowExp ( teacher_Id : number) {
 
   }
 
+
+  async getAdmin ( ) { 
+ try {
+  let admin = await this.newsRepository.query(`SELECT * FROM admin LIMIT 1`);
+  if(admin.length > 0) {
+    delete admin[0].password;
+  return admin[0];
+  }
+ } catch (error) {
+  throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong') , 201);
+
+ }
+
+ throw new HttpException(My_Helper.FAILED_RESPONSE('there is no admin') , 201);
+
+
+  }
+
+
+
+
+  async createByAdmin(createNewByAdminDto: CreateNewDtoByAdmin , file : Express.Multer.File) {
+
+
+    console.log(file);
+
+    let admin = await this.getAdmin();
+
+    // finding the groups 
+
+    try { 
+    let mNew = this.newsRepository.create({message : createNewByAdminDto.message , object :createNewByAdminDto.object , approved : true});
+     mNew.teacher = null;
+     mNew.admin = admin;
+    
+
+     if (file){
+
+     let fileExtinction = My_Helper.fileExtinction(file.mimetype);
+     let fileName = 'news_'+ uuidv4() + fileExtinction ;
+     let filePath = My_Helper.newsFiles+fileName;
+
+
+    const writeStream = createWriteStream(filePath);
+    writeStream.write(file.buffer);
+    
+    mNew.fileUrl = fileName;
+    }
+
+     return await this.newsRepository.save(mNew);
+    
+    } catch (error) {
+      console.log(error.message);
+      
+      throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong while creating new!') , 201);
+    }
+
+  }
+
+
+
   // get all the news of a group 
   async findAllNewsOf_a_Group ( group_id : number ) {
     
     let group = await this.findGroupByIdOrThrowExp(group_id);
+    let admin = await this.getAdmin();
     try {
       
       
       let newsOfThisGroup =  await this.newsRepository.
       query(
-        `SELECT id AS newsId ,group_Id ,object, message , fileUrl , teacher_Id , created_at , approved_date
-        FROM groupsViewNews INNER JOIN news ON groupsViewNews.new_Id = news.id
-        WHERE approved AND groupsViewNews.group_Id = ${group_id} ORDER BY news.created_at desc ;`
+        `SELECT id AS newsId ,group_Id ,object, message , fileUrl , teacher_Id, admin_Id , created_at , approved_date
+        FROM groupsViewNews right JOIN news ON groupsViewNews.new_Id = news.id 
+        WHERE approved AND (groupsViewNews.group_Id = ${group_id} or news.teacher_Id is null ) ORDER BY news.created_at desc ;`
 
         )
       
+
+      
+
       for ( let x = 0 ; x < newsOfThisGroup.length ; x ++){
-        let teacher = await this.findTeacherByIdOrThrowExp(newsOfThisGroup[x].teacher_Id);
+      
+        let sender = null;
+        if(newsOfThisGroup[x].teacher_Id) { 
+
+          sender = await this.findTeacherByIdOrThrowExp(newsOfThisGroup[x].teacher_Id);
+          delete sender.password;
+          newsOfThisGroup[x]['sender'] = sender;
+          newsOfThisGroup[x]['isTheSenderAdmin'] = false;
+        } else{
+          sender = admin;
+          newsOfThisGroup[x]['sender'] = sender;
+          newsOfThisGroup[x]['isTheSenderAdmin'] = true;
+        }
+
         
-        newsOfThisGroup[x]['sender'] = teacher;
-        delete newsOfThisGroup[x].teacher_Id;
       
       }
       return newsOfThisGroup;
     } catch (error) {
       console.log(error.message);
-      throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong') , 201);
+      throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong' + error.message) , 201);
     }
 
 }
@@ -227,7 +309,19 @@ private async  findNewByIdOrThrow_Exp ( id: number) {
       } 
    }
  
+   public async NewsSentByAdmin ( ) { 
+    let admin = await this.getAdmin();
+    try {
+      let newsOfAdmin = await this.newsRepository.find({where : {teacher : null , admin : !null }});
 
+     return {'admin' : admin , 'news' : newsOfAdmin };
+
+    } catch (error) {
+      console.log(error.message);
+      
+     throw new HttpException(My_Helper.FAILED_RESPONSE('something wrong') , 201);
+    } 
+ }
 
 
 

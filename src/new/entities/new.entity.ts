@@ -1,3 +1,4 @@
+import { Admin } from "src/admin/entities/admin.entity";
 import { Group } from "src/group/entities/group.entity";
 import { Teacher } from "src/teacher/teacher.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
@@ -52,14 +53,26 @@ export class New {
 
 
 @ManyToOne(type => Teacher ,{
+    nullable : true, 
     onDelete : 'CASCADE' , 
     onUpdate : 'CASCADE'
 })
 @JoinColumn({
     name : 'teacher_Id'
 })
-    teacher : Teacher;
+  teacher : Teacher;
 
+
+
+  @ManyToOne(type => Admin , {  
+    nullable : true, 
+    onDelete : 'CASCADE' , 
+    onUpdate : 'CASCADE'
+})
+@JoinColumn({
+    name : 'admin_Id'
+})
+  admin : Admin;
 
 
 }

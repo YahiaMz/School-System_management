@@ -16,6 +16,9 @@ const XLSX = require("xlsx")
 @Injectable()
 export class TeacherService {
 
+
+   
+
     constructor (@InjectRepository(Teacher) private teacherRepository : Repository<Teacher>){ }
     private salt : number = 12;
   
@@ -285,12 +288,12 @@ for(let i = 0; i < sheets.length; i++)
       data.push(res)
    })
 }
-  
+//  return data;
 // Printing data
 
 let newTeachersArr = [];
 
- for( let x = 0 ; x<data.length - 1 ; x ++) {
+ for( let x = 0 ; x<data.length  ; x ++) {
 
      try {
     let hashedPassword = await bcrypt.hash(data[x].PASSWORD , this.salt );

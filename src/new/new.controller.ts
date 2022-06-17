@@ -5,6 +5,7 @@ import { UpdateNewDto } from './dto/update-new.dto';
 import { My_Helper } from 'src/MY-HELPER-CLASS';
 import { group } from 'console';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateNewDtoByAdmin } from './dto/create-new-byAdmin.dto';
 
 @Controller('news')
 export class NewController {
@@ -20,10 +21,29 @@ export class NewController {
 
     }
 
+
+
+  @Post('/CreateByAdmin')
+  @UseInterceptors(FileInterceptor('file'))
+  async createByAdmin(@Body() createNewDtoByAdmin: CreateNewDtoByAdmin , @UploadedFile() file : Express.Multer.File) {
+
+     let newNewByAdmin = await this.newService.createByAdmin( createNewDtoByAdmin, file);
+     return My_Helper.SUCCESS_RESPONSE(newNewByAdmin);  
+
+
+    }
+
   @Get('/ofGroup/:group_Id')
   async findAllNewsOfGroup(@Param('group_Id') group_Id : number) { 
        console.log(group_Id);
     let news = await this.newService.findAllNewsOf_a_Group(group_Id);
+  return My_Helper.SUCCESS_RESPONSE(news);
+  }
+
+
+  @Get('/sentByAdmin')
+  async findNewsSentByAdmin() { 
+    let news = await this.newService.NewsSentByAdmin();
   return My_Helper.SUCCESS_RESPONSE(news);
   }
 
