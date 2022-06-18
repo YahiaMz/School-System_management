@@ -1,6 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UpdateAdminDto } from 'src/admin/dtos/update-admin.dto';
 import { CurrentSemesterService } from 'src/current-semester/current-semester.service';
 import { GroupService } from 'src/group/group.service';
 import { ModuleService } from 'src/module/module.service';
@@ -8,7 +7,6 @@ import { My_Helper } from 'src/MY-HELPER-CLASS';
 import { SaleService } from 'src/sale/sale.service';
 import { SectionService } from 'src/section/section.service';
 import { TeacherService } from 'src/teacher/teacher.service';
-import { TimetableService } from 'src/timetable/timetable.service';
 import { Repository } from 'typeorm';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
@@ -242,6 +240,9 @@ async update(id: number, updateLessonDto: UpdateLessonDto) {
 
       }
 
+
+
+
       
       return teacherLessons;
 
@@ -307,6 +308,35 @@ try {
 }
 
 
+}
+
+
+async currentLectures( ) {
+
+  
+  let currentSemester = await this.currentSemeseterService.getCurrentSemester();
+  
+
+  let cDate = new Date();
+let cTime = this.getRightForm(cDate.getHours()) + ":"+cDate.getMinutes();
+  //let cTime = this.getRightForm(8) + ":"+cDate.getMinutes();
+
+
+try {
+   let currentLectures = await this.lessonRepository.find({select : [ 'id','day' ,'startingTime','semester', 'endingTime' , 'lesson_Type' ,] ,where : { semester : currentSemester.current_semester , day :cDate.getDay() } , relations : ['teacher', "module",'group', "sale" ] , order : {startingTime:'ASC'}} );
+   
+   return currentLectures.filter(e => e.startingTime < cTime && e.endingTime > cTime);
+
+} catch (error) {
+   throw new HttpException(My_Helper.FAILED_RESPONSE(' something wrong ' + error.message) , 201);
+}
+
+
+}
+
+
+private getRightForm ( time : number  ){
+  return (time < 10)? '0'+time : time;
 }
 
 

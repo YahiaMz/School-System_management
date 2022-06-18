@@ -115,7 +115,8 @@ export class StudentService {
 
       //return levelWithHugeInfo;
       
-      let data = []
+      let data = [];
+      let dbData = [];
         
       const sheets = workbook.SheetNames
         
@@ -218,8 +219,9 @@ export class StudentService {
                      batch : levelWithHugeInfo.currentBatch , dateOfBirth : data[x].DATEOFBIRTH , wilaya  : data[x].WILAYA 
                   });
                   
-                  await this.studentRep.save(newStudent);
-                  
+                 let sStudent =await this.studentRep.save(newStudent);
+                 delete sStudent.password;
+                 dbData.push(sStudent);
                   
                } catch (error) {
                   throw ( new HttpException( { 
@@ -299,7 +301,10 @@ export class StudentService {
                batch : levelWithHugeInfo.currentBatch , dateOfBirth : data[x].DATEOFBIRTH , wilaya  : data[x].WILAYA 
                });
 
-               await this.studentRep.save(newStudent);
+               let s1Student =  await this.studentRep.save(newStudent);
+               delete s1Student.password;
+               dbData.push(s1Student);
+
  } catch (error) {
                   throw ( new HttpException( { 
                      success : false , 
@@ -327,7 +332,7 @@ export class StudentService {
 
       }
 
-      return data;      
+      return dbData;      
       
 
 

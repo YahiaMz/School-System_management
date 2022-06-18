@@ -86,7 +86,13 @@ async findSpeciality_In_Batch( batch_Id : number , spec_Id : number ){
    speciality : speciality  ? speciality : null
   });
 
-    await this.sectionRepo.save(section);
+    
+  let newSection = await this.sectionRepo.save(section);
+  if(speciality) {
+    newSection['shortName']=speciality.shortName;
+  }
+
+  return newSection;
  } catch (error) {
    console.log(error.message);
    

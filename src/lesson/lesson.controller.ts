@@ -15,6 +15,13 @@ export class LessonController {
     return My_Helper.SUCCESS_RESPONSE(newLesson);
   }
 
+
+  @Get('/Now')
+  async getCurrentLessons( ) {
+     let cLessons = await this.lessonService.currentLectures();
+     return My_Helper.SUCCESS_RESPONSE(cLessons);
+  }
+
   @Get('/allOfSection=:section_Id/inSemester=:semester')
   async findAll(@Param('section_Id') section_Id : string , @Param('semester') semester : string) {
   

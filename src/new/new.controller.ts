@@ -15,6 +15,9 @@ export class NewController {
   @UseInterceptors(FileInterceptor('file'))
   async create(@Body() createNewDto: CreateNewDto , @UploadedFile() file : Express.Multer.File) {
 
+    console.log(file);
+    
+
      let newNew = await this.newService.create(createNewDto , file);
      return My_Helper.SUCCESS_RESPONSE( newNew);  
 

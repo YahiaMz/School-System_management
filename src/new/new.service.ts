@@ -62,7 +62,7 @@ private async findTeacherByIdOrThrowExp ( teacher_Id : number) {
   async create(createNewDto: CreateNewDto , file : Express.Multer.File) {
 
 
-    console.log(file);
+   // console.log(file);
 
 
     if(createNewDto.groups.length == 0 ) { 
@@ -287,18 +287,25 @@ private async  findNewByIdOrThrow_Exp ( id: number) {
 
     // all new News to displaying it to the admin 
     public async approvedNews ( ) { 
+      let admin = this.getAdmin();
+            
       try {
         let newsToApprove = await this.newsRepository.query(
           ` SELECT news.id as new_Id , message ,object, fileUrl , teacher_Id , news.created_at FROM 
-            news inner join teacher  ON teacher.id = news.teacher_Id 
-            WHERE approved = true order by news.approved_date; 
+            news left join teacher ON teacher.id = news.teacher_Id 
+            WHERE approved = true  order by news.approved_date; 
           `);
  
           for ( let x : number = 0 ; x<newsToApprove.length ; x ++) { 
+           
+            if(newsToApprove[x].teacher_Id) {
             let teacher = await this.findTeacherByIdOrThrowExp(newsToApprove[x].teacher_Id);
-            
-            newsToApprove[x]['teacher'] = teacher;
+            newsToApprove[x]['sender'] = teacher;
             delete newsToApprove[x].teacher_Id;
+          } else {
+            newsToApprove[x]['sender'] = admin;
+
+          }
            }
  
        return newsToApprove;

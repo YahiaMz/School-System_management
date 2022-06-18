@@ -21,7 +21,7 @@ async createNewStudent( @Body() createStudentDto : CreateStudentDto) {
      return My_Helper.SUCCESS_RESPONSE(newStudent); 
 }
 
-@Post('/addByExcelFile/InLevel=:level_Id')
+@Post('addByExcelFile/InLevel=:level_Id')
 @UseInterceptors(FileInterceptor('file'))
 async addByExcelFile(@Param('level_Id') level_Id : string ,  @UploadedFile() file : Express.Multer.File ){
   

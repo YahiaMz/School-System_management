@@ -41,7 +41,7 @@ import { CurrentSemesterModule } from './current-semester/current-semester.modul
 
 
 const localhost = {
- type: 'mysql',
+type: 'mysql',
 host: 'localhost',
 port: 3306,
 username : 'Yahia',
@@ -80,7 +80,6 @@ imports: [TypeOrmModule.forRoot({
   username : 'root',
   password : 'BAP6CUjoW8LFkMei0U3v',
   database: 'railway',
-  
     entities: [
       Teacher , Admin , ModuleEntity , 
       Student  , Batch , Level , Speciality , 
@@ -88,7 +87,7 @@ imports: [TypeOrmModule.forRoot({
       New , Chapter , Timetable ,
        Lesson , Sale , Message , ChapterFile
     ],
-    synchronize: false,
+    synchronize: true,
     autoLoadEntities : true 
 
   }),
