@@ -75,11 +75,12 @@ const railway2 = {
 @Module({
 imports: [TypeOrmModule.forRoot({
   type: 'mysql',
-  host: 'containers-us-west-75.railway.app',
-  port: 6310,
+  host: 'containers-us-west-54.railway.app',
+  port: 6169,
   username : 'root',
-  password : 'OqpqwuCiziq2CcUAJPNE',
+  password : 'BAP6CUjoW8LFkMei0U3v',
   database: 'railway',
+  
     entities: [
       Teacher , Admin , ModuleEntity , 
       Student  , Batch , Level , Speciality , 
