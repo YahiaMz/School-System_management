@@ -61,13 +61,24 @@ const railwayDb = {
 };
 
 
+const railway2 = {
+  type: 'mysql',
+    host: 'containers-us-west-75.railway.app',
+    port: 6310,
+    username : 'root',
+    password : 'OqpqwuCiziq2CcUAJPNE',
+    database: 'railway',
+    
+}
+
+
 @Module({
 imports: [TypeOrmModule.forRoot({
   type: 'mysql',
-  host: 'containers-us-west-54.railway.app',
-  port: 6169,
+  host: 'containers-us-west-75.railway.app',
+  port: 6310,
   username : 'root',
-  password : 'BAP6CUjoW8LFkMei0U3v',
+  password : 'OqpqwuCiziq2CcUAJPNE',
   database: 'railway',
     entities: [
       Teacher , Admin , ModuleEntity , 
@@ -76,7 +87,7 @@ imports: [TypeOrmModule.forRoot({
       New , Chapter , Timetable ,
        Lesson , Sale , Message , ChapterFile
     ],
-    synchronize: true,
+    synchronize: false,
     autoLoadEntities : true 
 
   }),
