@@ -58,7 +58,7 @@ export class LessonController {
 
   @Get('/ofGroup/:id')
   async groupLessons(@Param('id') id: string) {
-    let lessons =  await this.lessonService.groupSchedule(+id);
+    let lessons =  await this.lessonService.groupScheduleV2(+id);
     return My_Helper.SUCCESS_RESPONSE(lessons);
   }
 

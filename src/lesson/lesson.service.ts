@@ -257,7 +257,7 @@ async teacherSchedule(teacher_Id : number) {
   let currentSemester = await this.currentSemeseterService.getCurrentSemester();
   let teacher = await this.teacherService.findTeacherByIdOrThrowExp(teacher_Id);
 try {
-   let teacherLessons = await this.lessonRepository.find({select : [ 'id','day' ,'startingTime','semester', 'endingTime' , 'lesson_Type' ,] ,where : {teacher : teacher , semester : currentSemester.current_semester} , relations : ['teacher', "module",'group', "sale" ] , order : {startingTime:'ASC'}} );
+   let teacherLessons = await this.lessonRepository.find({ select : [ 'id','day' ,'startingTime','semester', 'endingTime' , 'lesson_Type' ,] ,where : {teacher : teacher , semester : currentSemester.current_semester} , relations : ['teacher', "module",'group', "sale" ] , order : {startingTime:'ASC'}} );
    
    let sunday = teacherLessons.filter(({day}) => day == 1);
    let monday = teacherLessons.filter(({day}) => day == 2);
@@ -287,7 +287,9 @@ async groupSchedule(group_Id : number) {
   let currentSemester = await this.currentSemeseterService.getCurrentSemester();
   let group = await this.groupService.findJustTheGroupByIdOrThrowExp(group_Id);
 try {
-   let teacherLessons = await this.lessonRepository.find({select : [ 'id','day' ,'startingTime','semester', 'endingTime' , 'lesson_Type' ,] ,where : {group : group , semester : currentSemester.current_semester} , relations : ['teacher', "module",'group', "sale" ] , order : {startingTime:'ASC'}} );
+   let teacherLessons = await this.lessonRepository.find({select : [ 'id','day' ,'startingTime','semester', 'endingTime' , 'lesson_Type' ,] , 
+   where : {group : group , semester : currentSemester.current_semester} ,
+   relations : ['teacher', "module",'group', "sale" ] , order : {startingTime:'ASC'}} );
    
    let sunday = teacherLessons.filter(({day}) => day == 1);
    let monday = teacherLessons.filter(({day}) => day == 2);
@@ -309,6 +311,53 @@ try {
 
 
 }
+
+
+async groupScheduleV2(group_Id : number) {
+  let currentSemester = await this.currentSemeseterService.getCurrentSemester();
+  let group = await this.groupService.findGroupWithHimSection(group_Id);
+try {
+   let groupLessons = await this.lessonRepository.query(`select * from lesson l  left join  \`group\` g on g.id = l.group_Id where( g.id = ${group_Id} or g.id is null  ) and l.section_Id = ${group.section.id} and l.semester = ${currentSemester.current_semester}` );
+
+   delete group.section;
+
+   for(let x = 0 ; x<groupLessons.length ; x++) {
+     let mModule = await this.moduleService.findModuleByIdOrThrow_Exp(groupLessons[x].module_Id ) ;
+     let teacher = await this.teacherService.findTeacherByIdOrThrowExp(groupLessons[x].teacher_Id);
+     let room = await this.saleService.findSaleByIdOrThrowExp(groupLessons[x].sale_Id);
+   
+     delete groupLessons[x].module_Id;
+     delete groupLessons[x].teacher_Id;
+     delete groupLessons[x].sale_Id;
+
+     groupLessons[x]['group'] = group;
+     groupLessons[x]['module'] = mModule;
+     groupLessons[x]['teacher'] = teacher;
+     groupLessons[x]['sale'] = room;
+  
+   }
+
+   let sunday = groupLessons.filter(({day}) => day == 1);
+   let monday = groupLessons.filter(({day}) => day == 2);
+   let tuesday = groupLessons.filter(({day}) => day == 3);
+   let wednesday = groupLessons.filter(({day}) => day == 4);
+   let thursday = groupLessons.filter(({day}) => day == 5);
+    
+    return {
+      'sunday' : sunday , 
+      "monday" : monday , 
+      "tuesday" : tuesday , 
+      "wednesday" : wednesday , 
+      "thursday" : thursday
+    };
+
+} catch (error) {
+   throw new HttpException(My_Helper.FAILED_RESPONSE(' something wrong ' + error.message) , 201);
+}
+
+
+}
+
 
 
 async currentLectures( ) {
