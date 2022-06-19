@@ -1,4 +1,4 @@
-import { IsBoolean, IsIn, IsInt, IsString } from "class-validator";
+import { IsBoolean, IsIn, IsInt, IsOptional, IsString } from "class-validator";
 
 export class CreateSaleDto {
 
@@ -12,13 +12,16 @@ export class CreateSaleDto {
     hasDataShow : boolean;
     
     @IsBoolean()
+    @IsOptional()
     hasNetworkEquipment : boolean;
 
     @IsString()
+    @IsOptional()
     @IsIn(['CPI' , 'CS'])
     area : string;
 
     @IsString()
+    @IsOptional()
     @IsIn(['TD' , 'TP' , 'AMPHI'])
     roomType : string;
     

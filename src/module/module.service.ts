@@ -80,6 +80,8 @@ constructor( @InjectRepository(Module) private moduleRepository : Repository<Mod
 
         let level = await this.findLevelByIdOrThrowExp(moduleInfo.level_Id);
         let speciality = null;
+
+
         if(moduleInfo.speciality_Id) {
             speciality = await this.specialityService.findSpecialityByIdoOrThrowExp(moduleInfo.speciality_Id);
            
@@ -107,10 +109,7 @@ constructor( @InjectRepository(Module) private moduleRepository : Repository<Mod
         }
 
     
-        if( image && !My_Helper.is_Image(image.mimetype))  { 
-            throw new HttpException( My_Helper.
-                FAILED_RESPONSE('image must be a [.png , .jpeg , .jpg , .webp]') , 201)
-            }
+  
 
         
         
@@ -276,11 +275,13 @@ constructor( @InjectRepository(Module) private moduleRepository : Repository<Mod
               } 
         catch( e ) { 
 
+            await this.moduleRepository.remove(moduleToRemove);    
             throw ( new HttpException( {
                 success : false , 
                 message : 'Something wrong !'
              },
               201));
+
         }
         
         throw ( new HttpException( My_Helper.FAILED_RESPONSE('module not found!')  , 201)  );
